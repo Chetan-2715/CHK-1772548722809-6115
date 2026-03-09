@@ -1,0 +1,123 @@
+.accessibility-controls {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.btn-floating {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.4);
+    cursor: pointer;
+    transition: all var(--transition-bounce);
+}
+
+.btn-floating:hover {
+    transform: scale(1.1) translateY(-5px);
+    background-color: var(--warning-color);
+    box-shadow: 0 10px 25px 0 rgba(245, 158, 11, 0.5);
+}
+
+.spin-slow {
+    animation: spin 6s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.a11y-panel {
+    display: none;
+    width: 320px;
+    transform-origin: bottom right;
+    animation: popIn var(--transition-bounce) forwards;
+}
+
+.accessibility-controls.open .a11y-panel {
+    display: block;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.a11y-panel h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    color: var(--text-main);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.a11y-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.a11y-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+    text-transform: capitalize;
+}
+
+.a11y-btn:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.a11y-btn.active {
+    background-color: var(--success-light);
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.hover-grow:hover {
+    transform: scale(1.03);
+}
+
+@media (max-width: 480px) {
+    .a11y-panel {
+        width: 280px;
+    }
+}
