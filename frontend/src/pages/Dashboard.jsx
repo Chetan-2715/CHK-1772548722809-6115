@@ -69,21 +69,21 @@ const Dashboard = () => {
                 </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
                     <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3 flex-1 lg:flex-none">
-                        <label className="text-secondary font-semibold whitespace-nowrap text-sm uppercase tracking-wider">Active Domain:</label>
+                        <label className="text-secondary font-semibold whitespace-nowrap text-sm uppercase tracking-wider">{t('dashboard.active_domain')}</label>
                         <select
                             value={currentDomain}
                             onChange={handleDomainChange}
                             className="bg-transparent border-none outline-none font-bold text-primary cursor-pointer flex-1"
                             style={{ fontSize: '1rem', minWidth: '140px' }}
                         >
-                            <option value="ayurvedic">Ayurvedic</option>
-                            <option value="homeopathy">Homeopathy</option>
-                            <option value="allopathy">Allopathy</option>
-                            <option value="cardiologist">Cardiologist</option>
-                            <option value="neurological">Neurological</option>
-                            <option value="orthopedic">Orthopedic</option>
-                            <option value="pediatric">Pediatric</option>
-                            <option value="other">Other Speciality</option>
+                            <option value="ayurvedic">{t('domains.ayurvedic')}</option>
+                            <option value="homeopathy">{t('domains.homeopathy')}</option>
+                            <option value="allopathy">{t('domains.allopathy')}</option>
+                            <option value="cardiologist">{t('domains.cardiologist')}</option>
+                            <option value="neurological">{t('domains.neurological')}</option>
+                            <option value="orthopedic">{t('domains.orthopedic')}</option>
+                            <option value="pediatric">{t('domains.pediatric')}</option>
+                            <option value="other">{t('domains.other')}</option>
                         </select>
                     </div>
                     <Link to="/upload" className="btn btn-primary px-8 py-3.5 shadow-primary" onMouseEnter={() => speakText("Scan a new prescription")}>
@@ -174,7 +174,7 @@ const Dashboard = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <p className="text-secondary p-4">Could not load additional details.</p>
+                                            <p className="text-secondary p-4">{t('dashboard.could_not_load_details')}</p>
                                         )}
                                     </div>
                                 )}

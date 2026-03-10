@@ -9,12 +9,14 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     const domain = localStorage.getItem('selectedConcern');
+    const language = localStorage.getItem('language') || 'en';
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     if (domain) {
         config.headers.domain = domain;
     }
+    config.headers['Accept-Language'] = language;
     return config;
 });
 

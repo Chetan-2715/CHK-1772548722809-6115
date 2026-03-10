@@ -31,11 +31,12 @@ class MedicalTermRequest(BaseModel):
 async def get_medicine_by_name(
     name: str,
     domain: str = Header(None),
+    accept_language: str = Header("en"),
     authorization: str = Header(None),
     db: Session = Depends(get_db)
 ):
     """Get medicine information by name."""
-    result = await search_medicine(name, db, domain)
+    result = await search_medicine(name, db, domain, language=accept_language)
 
     if not result["success"]:
         raise HTTPException(status_code=500, detail=result.get("error", "Failed to get medicine info"))

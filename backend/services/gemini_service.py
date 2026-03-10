@@ -19,8 +19,20 @@ def get_text_model():
     """Get a Gemini Text model instance."""
     return genai.GenerativeModel("gemini-2.5-flash")
 
+LANG_MAP = {
+    'en': 'English',
+    'hi': 'Hindi (हिंदी)',
+    'mr': 'Marathi (मराठी)',
+}
 
-async def extract_prescription_data(image_bytes: bytes, mime_type: str = "image/jpeg", domain: str = None) -> dict:
+def get_language_instruction(lang: str) -> str:
+    lang_name = LANG_MAP.get(lang, 'English')
+    if lang and lang != 'en':
+        return f"\nCRITICAL LANGUAGE INSTRUCTION: You MUST respond with ALL text values in {lang_name}. The JSON keys must stay in English, but ALL string values (medicine usage, dosage instructions, side effects, precautions, explanations, etc.) MUST be written in {lang_name} script. Do NOT use English for any text values.\n"
+    return ""
+
+
+async def extract_prescription_data(image_bytes: bytes, mime_type: str = "image/jpeg", domain: str = None, language: str = "en") -> dict:
     """
     Extract medicine information from a prescription image using Gemini Vision API.
 
@@ -73,6 +85,8 @@ IMPORTANT:
 - Be accurate with medicine names and dosages
 - Return ONLY valid JSON, no markdown formatting"""
 
+    prompt = prompt + get_language_instruction(language)
+
     image_part = {
         "mime_type": mime_type,
         "data": image_bytes
@@ -100,7 +114,7 @@ IMPORTANT:
         return {"success": False, "error": f"AI processing failed: {str(e)}"}
 
 
-async def get_medicine_info(medicine_name: str, domain: str = None) -> dict:
+async def get_medicine_info(medicine_name: str, domain: str = None, language: str = "en") -> dict:
     """
     Get detailed information about a medicine using Gemini API.
     """
@@ -139,6 +153,8 @@ IMPORTANT:
 - Use simple language suitable for senior citizens
 - Be medically accurate
 - Return ONLY valid JSON, no markdown formatting"""
+
+    prompt = prompt + get_language_instruction(language)
 
     try:
         response = model.generate_content(prompt)

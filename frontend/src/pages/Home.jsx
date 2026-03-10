@@ -28,7 +28,7 @@ const Home = () => {
                                 {t('home.get_started')} <ArrowRight size={20} />
                             </Link>
                         ) : (
-                            <Link to="/upload" className="btn btn-primary hero-btn" onMouseEnter={() => speakText("Scan a new prescription")}>
+                            <Link to="/upload" className="btn btn-primary hero-btn" onMouseEnter={() => speakText(t('home.scan_new'))}>
                                 <Camera size={20} /> {t('home.scan_new')}
                             </Link>
                         )}
@@ -46,7 +46,7 @@ const Home = () => {
                             <div className="skeleton-line half"></div>
                             <div className="pill-container">
                                 <div className="pill"></div>
-                                <div className="pill-text">Paracetamol 500mg</div>
+                                <div className="pill-text">{t('home.sample_pill')}</div>
                             </div>
                         </div>
                     </div>

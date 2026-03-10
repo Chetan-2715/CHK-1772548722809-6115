@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { medicineAPI } from '../services/api';
 import { History, Search, Camera, CheckSquare, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const MedicineHistory = () => {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -32,19 +34,19 @@ const MedicineHistory = () => {
 
     const getActionText = (action) => {
         switch (action) {
-            case 'search': return 'Searched manually';
-            case 'scan': return 'Scanned Barcode/Image';
-            case 'verify': return 'Verified Check';
-            case 'prescription': return 'Extracted from Prescription';
-            default: return 'Viewed';
+            case 'search': return t('history.searched');
+            case 'scan': return t('history.scanned');
+            case 'verify': return t('history.verified');
+            case 'prescription': return t('history.from_prescription');
+            default: return t('history.viewed');
         }
     };
 
     return (
         <div className="container animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
             <div className="mb-8">
-                <h1>Interaction History</h1>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', marginTop: '0.25rem' }}>A log of all medicines you have checked.</p>
+                <h1>{t('history.title')}</h1>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', marginTop: '0.25rem' }}>{t('history.subtitle')}</p>
             </div>
 
             {loading ? (
@@ -52,7 +54,7 @@ const MedicineHistory = () => {
             ) : history.length === 0 ? (
                 <div className="card text-center p-12 bg-slate-50 border-dashed border-2 border-slate-300">
                     <History size={48} className="mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-slate-500">No history yet</h3>
+                    <h3 className="text-slate-500">{t('history.no_history')}</h3>
                 </div>
             ) : (
                 <div className="flex flex-col gap-4">

@@ -8,7 +8,7 @@ from models.prescription import Prescription, PrescriptionMedicine
 from services.gemini_service import get_medicine_info, identify_tablet_from_image, compare_compositions
 
 
-async def search_medicine(name: str, db: Session, domain: str = None) -> dict:
+async def search_medicine(name: str, db: Session, domain: str = None, language: str = "en") -> dict:
     """
     Search for a medicine by name.
     1. Check database first
@@ -30,7 +30,7 @@ async def search_medicine(name: str, db: Session, domain: str = None) -> dict:
         }
 
     # Use Gemini API
-    gemini_result = await get_medicine_info(name, domain)
+    gemini_result = await get_medicine_info(name, domain, language=language)
 
     if not gemini_result["success"]:
         return gemini_result

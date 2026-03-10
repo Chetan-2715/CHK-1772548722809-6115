@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../App';
 import { medicineAPI } from '../services/api';
 import { ShieldCheck, AlertTriangle, XCircle, Search, CalendarCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const VerifyTablet = () => {
     // This component verifies if a tablet belongs to a user's prescriptions
@@ -10,6 +11,7 @@ const VerifyTablet = () => {
     const [result, setResult] = useState(null);
     const [error, setError] = useState('');
     const { speakText } = useContext(AppContext);
+    const { t } = useTranslation();
 
     const handleVerify = async (e) => {
         e.preventDefault();
@@ -18,22 +20,22 @@ const VerifyTablet = () => {
         setLoading(true);
         setError('');
         setResult(null);
-        speakText(`Verifying if ${searchTerm} is in your prescriptions`);
+        speakText(t('verify.voice.verifying', { name: searchTerm }));
 
         try {
             const res = await medicineAPI.verifyTablet({ medicine_name: searchTerm });
             setResult(res.data);
 
             if (res.data.status === 'confirmed') {
-                speakText(`Yes. ${searchTerm} is in your prescription.`);
+                speakText(t('verify.voice.confirmed', { name: searchTerm }));
             } else if (res.data.status === 'replacement') {
-                speakText(`Warning. ${searchTerm} is not directly in your prescription but is similar to another medicine.`);
+                speakText(t('verify.voice.replacement', { name: searchTerm }));
             } else {
-                speakText(`Alert. ${searchTerm} is NOT in your prescription.`);
+                speakText(t('verify.voice.warning', { name: searchTerm }));
             }
 
         } catch (err) {
-            setError(err.response?.data?.detail || "Verification failed");
+            setError(err.response?.data?.detail || t('verify.error_failed'));
         } finally {
             setLoading(false);
         }
@@ -58,25 +60,25 @@ const VerifyTablet = () => {
     return (
         <div className="container py-8 max-w-2xl mx-auto animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
             <div className="text-center mb-8">
-                <h1>Verify Your Tablets</h1>
+                <h1>{t('verify.title')}</h1>
                 <p className="text-secondary" style={{ fontSize: '1.25rem' }}>
-                    Type a medicine name to check if your doctor prescribed it for you.
+                    {t('verify.subtitle')}
                 </p>
             </div>
 
             <div className="card card-glass mb-8 p-6 shadow-md border-t-4" style={{ borderTopColor: 'var(--primary-color)' }}>
                 <form onSubmit={handleVerify} className="flex-col gap-4">
-                    <label className="label font-bold text-lg mb-2 block">Medicine Name</label>
+                    <label className="label font-bold text-lg mb-2 block">{t('verify.medicine_name')}</label>
                     <div className="flex gap-4">
                         <input
                             type="text"
                             className="input flex-1 p-4 text-xl bg-white border-2 focus:border-blue-500 rounded-lg shadow-sm"
-                            placeholder="e.g. Amlodipine"
+                            placeholder={t('verify.placeholder')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         <button type="submit" className="btn btn-primary px-8 text-lg" disabled={loading || !searchTerm.trim()}>
-                            {loading ? 'Checking...' : <Search size={24} />}
+                            {loading ? t('verify.checking') : <Search size={24} />}
                         </button>
                     </div>
                 </form>
@@ -97,9 +99,9 @@ const VerifyTablet = () => {
                     </div>
 
                     <h2 className="text-3xl mb-4 font-bold" style={{ color: getStatusColor(result.status) }}>
-                        {result.status === 'confirmed' && "Safe to Take"}
-                        {result.status === 'replacement' && "Similar Substitute"}
-                        {result.status === 'warning' && "Not Prescribed!"}
+                        {result.status === 'confirmed' && t('verify.safe_to_take')}
+                        {result.status === 'replacement' && t('verify.similar_substitute')}
+                        {result.status === 'warning' && t('verify.not_prescribed')}
                     </h2>
 
                     <p className="text-xl text-slate-700 mb-8 font-medium leading-relaxed bg-slate-50 p-6 rounded-xl border border-slate-200">
@@ -109,11 +111,11 @@ const VerifyTablet = () => {
                     {result.status === 'confirmed' && result.prescription_details && (
                         <div className="text-left bg-green-50 p-6 rounded-xl border border-green-200 mt-4 shadow-sm inline-block mx-auto max-w-md w-full">
                             <h4 className="flex items-center gap-2 text-green-800 font-bold mb-4 border-b border-green-200 pb-2">
-                                <CalendarCheck size={20} /> Prescribed Details
+                                <CalendarCheck size={20} /> {t('verify.prescribed_details')}
                             </h4>
-                            <p className="text-lg mb-2 text-green-900 border-b border-green-100 pb-2"><strong>Medicine:</strong> {result.prescription_details.medicine_name}</p>
-                            <p className="text-lg mb-2 text-green-900 border-b border-green-100 pb-2"><strong>Dosage:</strong> {result.prescription_details.dosage}</p>
-                            <p className="text-lg text-green-900"><strong>Instructions:</strong> {result.prescription_details.instructions}</p>
+                            <p className="text-lg mb-2 text-green-900 border-b border-green-100 pb-2"><strong>{t('verify.medicine')}:</strong> {result.prescription_details.medicine_name}</p>
+                            <p className="text-lg mb-2 text-green-900 border-b border-green-100 pb-2"><strong>{t('verify.dosage')}:</strong> {result.prescription_details.dosage}</p>
+                            <p className="text-lg text-green-900"><strong>{t('verify.instructions')}:</strong> {result.prescription_details.instructions}</p>
                         </div>
                     )}
                 </div>

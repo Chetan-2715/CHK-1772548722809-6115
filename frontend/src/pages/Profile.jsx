@@ -7,10 +7,12 @@ import AppointmentScheduler from '../components/AppointmentScheduler';
 import { FileText, Users, BarChart2, Calendar, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
+import { useTranslation } from 'react-i18next';
 
 const Profile = () => {
     const navigate = useNavigate();
     const { logout, speakText } = useContext(AppContext);
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('medical');
     const [isEditingMedical, setIsEditingMedical] = useState(false);
 
@@ -21,15 +23,15 @@ const Profile = () => {
     };
 
     const tabs = [
-        { id: 'medical', name: 'Medical History', icon: FileText },
-        { id: 'caretaker', name: 'Caretaker', icon: Users },
-        { id: 'reports', name: 'Weekly Reports', icon: BarChart2 },
-        { id: 'appointments', name: 'Appointment Scheduler', icon: Calendar },
+        { id: 'medical', name: t('profile.medical_history'), icon: FileText },
+        { id: 'caretaker', name: t('profile.caretaker'), icon: Users },
+        { id: 'reports', name: t('profile.weekly_reports'), icon: BarChart2 },
+        { id: 'appointments', name: t('profile.appointments'), icon: Calendar },
     ];
 
     return (
         <div className="container" style={{ padding: '2rem 1.5rem' }}>
-            <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">My Profile</h1>
+            <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">{t('profile.title')}</h1>
 
             <div className="flex flex-col md:flex-row gap-12">
                 {/* Sidebar */}
@@ -56,11 +58,11 @@ const Profile = () => {
                         <button
                             onClick={handleLogout}
                             className={`flex items-center gap-4 w-full text-left py-1 transition-all group focus:outline-none`}
-                            onMouseEnter={() => speakText("Logout")}
+                            onMouseEnter={() => speakText(t('profile.logout'))}
                         >
                             <LogOut size={32} color="#1E293B" strokeWidth={2} style={{ transition: 'color 0.2s' }} className="group-hover:opacity-80" />
                             <span style={{ color: "#1E293B" }} className="text-[1.15rem] leading-none font-bold group-hover:opacity-80 transition-opacity">
-                                Logout
+                                {t('profile.logout')}
                             </span>
                         </button>
                     </div>

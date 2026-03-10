@@ -2,12 +2,14 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
 import i18n from '../i18n';
+import { useTranslation } from 'react-i18next';
 import './LanguageSelect.css';
 
 const LanguageSelect = () => {
     const navigate = useNavigate();
     const { setLanguage } = useContext(AppContext);
     const [selectedLang, setSelectedLang] = useState('en');
+    const { t } = useTranslation();
 
     const languages = [
         { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -35,8 +37,8 @@ const LanguageSelect = () => {
         <div className="language-select-container">
             <div className="language-select-card">
                 <div className="language-header">
-                    <h1>Choose Your Language</h1>
-                    <p>अपनी भाषा चुनें | உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்</p>
+                    <h1>{t('lang_popup.title')}</h1>
+                    <p>{t('lang_popup.subtitle')}</p>
                 </div>
 
                 <div className="language-grid">
@@ -53,7 +55,7 @@ const LanguageSelect = () => {
                 </div>
 
                 <div className="language-footer">
-                    <p>You can change your language preference anytime in Settings</p>
+                    <p>{t('lang_popup.footer')}</p>
                 </div>
             </div>
         </div>

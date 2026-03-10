@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import i18n from './i18n';
 import Navbar from './components/Navbar';
 import AccessibilityControls from './components/AccessibilityControls';
 import Home from './pages/Home';
@@ -20,6 +21,7 @@ function App() {
     const [theme, setTheme] = useState('light'); // light, dark, high-contrast
     const [fontSize, setFontSize] = useState('normal'); // normal, large, xlarge
     const [voiceEnabled, setVoiceEnabled] = useState(false);
+    const [language, setLanguage] = useState('en');
 
     useEffect(() => {
         // Check local storage for user and settings
@@ -36,6 +38,12 @@ function App() {
 
         const storedVoice = localStorage.getItem('voiceEnabled');
         if (storedVoice) setVoiceEnabled(storedVoice === 'true');
+
+        const storedLang = localStorage.getItem('language');
+        if (storedLang) {
+            setLanguage(storedLang);
+            i18n.changeLanguage(storedLang);
+        }
     }, []);
 
     // Update DOM when accessibility settings change
@@ -109,7 +117,13 @@ function App() {
         setFontSize,
         voiceEnabled,
         setVoiceEnabled,
-        speakText
+        speakText,
+        language,
+        setLanguage: (lang) => {
+            setLanguage(lang);
+            localStorage.setItem('language', lang);
+            i18n.changeLanguage(lang);
+        }
     };
 
     return (

@@ -2,6 +2,7 @@ import React, { useState, useContext, useRef } from 'react';
 import { Search, ScanLine, Camera, Info, CheckCircle, AlertTriangle, AlertCircle, Volume2, ArrowLeft, RefreshCw, Pill } from 'lucide-react';
 import { AppContext } from '../App';
 import { medicineAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 import './ScanMedicine.css';
 
 const ScanMedicine = () => {
@@ -19,6 +20,7 @@ const ScanMedicine = () => {
     const [photoPreview, setPhotoPreview] = useState(null);
 
     const { speakText } = useContext(AppContext);
+    const { t } = useTranslation();
     const barcodeFileRef = useRef(null);
     const photoFileRef = useRef(null);
 
@@ -30,7 +32,7 @@ const ScanMedicine = () => {
         setBarcodePreview(null);
         setPhotoPreview(null);
         setLoadingSection(null);
-        speakText("Ready to search again");
+        speakText(t('scan.voice.ready_again'));
     };
 
     // ---- Search by Name ----
@@ -41,21 +43,21 @@ const ScanMedicine = () => {
         setLoadingSection('name');
         setError('');
         setResult(null);
-        speakText(`Searching for ${searchTerm}`);
+        speakText(t('scan.voice.searching_for', { name: searchTerm }));
 
         try {
             const res = await medicineAPI.search(searchTerm);
             if (res.data.success) {
                 setResult(res.data.data);
-                speakText(`Found information for ${res.data.data.medicine_name}`);
+                speakText(t('scan.voice.found_info', { name: res.data.data.medicine_name }));
             } else {
-                setError(res.data.error || 'Medicine not found. Please check the spelling.');
-                speakText("Medicine not found");
+                setError(res.data.error || t('scan.errors.medicine_not_found'));
+                speakText(t('scan.voice.medicine_not_found'));
             }
         } catch (err) {
-            const msg = err.response?.data?.detail || "An error occurred";
+            const msg = err.response?.data?.detail || t('scan.errors.generic');
             setError(msg);
-            speakText(`Error: ${msg}`);
+            speakText(t('scan.voice.error_prefix', { message: msg }));
         } finally {
             setLoadingSection(null);
         }
@@ -69,21 +71,21 @@ const ScanMedicine = () => {
         setLoadingSection('barcode');
         setError('');
         setResult(null);
-        speakText(`Looking up barcode number ${barcode}`);
+        speakText(t('scan.voice.lookup_barcode', { barcode }));
 
         try {
             const res = await medicineAPI.scanBarcode({ barcode });
             if (res.data.success) {
                 setResult(res.data.data);
-                speakText(`Found medicine: ${res.data.data.medicine_name}`);
+                speakText(t('scan.voice.found_medicine', { name: res.data.data.medicine_name }));
             } else {
-                setError(res.data.message || 'Barcode not found in database');
-                speakText("Barcode not found in database");
+                setError(res.data.message || t('scan.errors.barcode_not_found'));
+                speakText(t('scan.voice.barcode_not_found'));
             }
         } catch (err) {
-            const msg = err.response?.data?.detail || "An error occurred";
+            const msg = err.response?.data?.detail || t('scan.errors.generic');
             setError(msg);
-            speakText(`Error: ${msg}`);
+            speakText(t('scan.voice.error_prefix', { message: msg }));
         } finally {
             setLoadingSection(null);
         }
@@ -103,7 +105,7 @@ const ScanMedicine = () => {
         setLoadingSection('barcode');
         setError('');
         setResult(null);
-        speakText("Scanning barcode image, please wait");
+        speakText(t('scan.voice.scanning_barcode_image'));
 
         const formData = new FormData();
         formData.append('file', selectedFile);
@@ -113,14 +115,14 @@ const ScanMedicine = () => {
             if (res.data.success !== false && res.data.lookup_result?.success) {
                 setResult(res.data.lookup_result.data);
                 setBarcode(res.data.barcode);
-                speakText(`Success. Identified as ${res.data.lookup_result.data.medicine_name}`);
+                speakText(t('scan.voice.identified_as', { name: res.data.lookup_result.data.medicine_name }));
             } else {
-                setError(res.data.message || 'Could not decode barcode from image.');
-                speakText("Could not decode barcode from image");
+                setError(res.data.message || t('scan.errors.decode_failed'));
+                speakText(t('scan.voice.decode_failed'));
             }
         } catch (err) {
-            setError("Error scanning barcode image. Please try again.");
-            speakText("Error scanning barcode image");
+            setError(t('scan.errors.scan_image_failed'));
+            speakText(t('scan.voice.scan_image_failed'));
         } finally {
             setLoadingSection(null);
         }
@@ -140,7 +142,7 @@ const ScanMedicine = () => {
         setLoadingSection('photo');
         setError('');
         setResult(null);
-        speakText("Analyzing medicine photo, please wait");
+        speakText(t('scan.voice.analyzing_photo'));
 
         const formData = new FormData();
         formData.append('file', selectedFile);
@@ -150,18 +152,18 @@ const ScanMedicine = () => {
             if (verifyRes.data.success) {
                 if (verifyRes.data.medicine_info) {
                     setResult(verifyRes.data.medicine_info);
-                    speakText("Identified visually: " + verifyRes.data.medicine_info.medicine_name);
+                    speakText(t('scan.voice.identified_visually', { name: verifyRes.data.medicine_info.medicine_name }));
                 } else {
-                    setError('Could not fully identify. ' + (verifyRes.data.message || ''));
-                    speakText("Could not fully identify the medicine.");
+                    setError(t('scan.errors.partial_identify') + ' ' + (verifyRes.data.message || ''));
+                    speakText(t('scan.voice.partial_identify'));
                 }
             } else {
-                setError(verifyRes.data.error || "Could not identify medicine from image");
-                speakText("Could not identify medicine from image");
+                setError(verifyRes.data.error || t('scan.errors.identify_failed'));
+                speakText(t('scan.voice.identify_failed'));
             }
         } catch (err) {
-            setError("Network or processing error while analyzing the photo.");
-            speakText("Error analyzing photo");
+            setError(t('scan.errors.analyze_network'));
+            speakText(t('scan.voice.analyze_error'));
         } finally {
             setLoadingSection(null);
         }
@@ -178,6 +180,29 @@ const ScanMedicine = () => {
         </div>
     );
 
+    const buildFullMedicineSpeech = (medicine) => {
+        if (!medicine) return '';
+
+        const parts = [medicine.medicine_name];
+
+        if (medicine.composition) {
+            parts.push(`Composition: ${medicine.composition}.`);
+        }
+
+        parts.push(`Primary use: ${medicine.usage || t('scan.unknown')}.`);
+        parts.push(`Standard dose: ${medicine.dosage || t('scan.refer_doctor')}.`);
+
+        if (medicine.usage_instructions) {
+            parts.push(`Instructions: ${medicine.usage_instructions}.`);
+        }
+
+        parts.push(`Side effects: ${medicine.side_effects || t('scan.none_reported')}.`);
+        parts.push(`Precautions: ${medicine.precautions || t('scan.standard_safety')}.`);
+        parts.push(`Missed dose guidance: ${medicine.missed_dose_guidelines || t('scan.take_as_remembered')}.`);
+
+        return parts.join(' ');
+    };
+
     return (
         <div className="scan-page">
             <div className="scan-page-inner">
@@ -185,10 +210,10 @@ const ScanMedicine = () => {
                 {/* Hero Header */}
                 <div className="scan-hero">
                     <div className="scan-hero-badge">
-                        <ScanLine size={14} /> Advanced Identification
+                        <ScanLine size={14} /> {t('scan.badge')}
                     </div>
-                    <h1>Medicine <span>Intelligence.</span></h1>
-                    <p>Identify any medicine instantly using AI. Choose your method below.</p>
+                    <h1>{t('scan.hero_title_1')} <span>{t('scan.hero_title_2')}</span></h1>
+                    <p>{t('scan.hero_sub')}</p>
                 </div>
 
                 {/* ===== TABLE LAYOUT ===== */}
@@ -200,19 +225,19 @@ const ScanMedicine = () => {
                                     <th>
                                         <div className="scan-th-content">
                                             <div className="scan-th-icon blue"><Search size={30} /></div>
-                                            <h3 className="scan-th-title">Search by Name</h3>
+                                            <h3 className="scan-th-title">{t('scan.col_name')}</h3>
                                         </div>
                                     </th>
                                     <th>
                                         <div className="scan-th-content">
                                             <div className="scan-th-icon green"><ScanLine size={30} /></div>
-                                            <h3 className="scan-th-title">Search by Barcode</h3>
+                                            <h3 className="scan-th-title">{t('scan.col_barcode')}</h3>
                                         </div>
                                     </th>
                                     <th>
                                         <div className="scan-th-content">
                                             <div className="scan-th-icon amber"><Camera size={30} /></div>
-                                            <h3 className="scan-th-title">Search by Photo</h3>
+                                            <h3 className="scan-th-title">{t('scan.col_photo')}</h3>
                                         </div>
                                     </th>
                                 </tr>
@@ -222,13 +247,13 @@ const ScanMedicine = () => {
                                     {/* ── Col 1: Name Search ── */}
                                     <td>
                                         {loadingSection === 'name' ? (
-                                            <SectionLoader message="Searching by name..." />
+                                            <SectionLoader message={t('scan.searching_name')} />
                                         ) : (
                                             <form onSubmit={handleSearch} className="scan-name-form">
                                                 <input
                                                     type="text"
                                                     className="scan-name-input"
-                                                    placeholder="e.g. Paracetamol"
+                                                    placeholder={t('scan.name_placeholder')}
                                                     value={searchTerm}
                                                     onChange={(e) => setSearchTerm(e.target.value)}
                                                 />
@@ -238,7 +263,7 @@ const ScanMedicine = () => {
                                                     className="scan-btn-primary"
                                                 >
                                                     <CheckCircle size={20} />
-                                                    Find Medicine
+                                                    {t('scan.find_medicine')}
                                                 </button>
                                             </form>
                                         )}
@@ -250,11 +275,11 @@ const ScanMedicine = () => {
                                             <div>
                                                 {barcodePreview && (
                                                     <div className="scan-barcode-preview" style={{ marginBottom: '1rem' }}>
-                                                        <img src={barcodePreview} alt="Barcode scan" />
-                                                        <div className="preview-overlay">Uploaded Image</div>
+                                                        <img src={barcodePreview} alt={t('scan.col_barcode')} />
+                                                        <div className="preview-overlay">{t('scan.uploaded_image')}</div>
                                                     </div>
                                                 )}
-                                                <SectionLoader message="Scanning barcode..." />
+                                                <SectionLoader message={t('scan.scanning_barcode')} />
                                             </div>
                                         ) : (
                                             <div className="scan-barcode-col">
@@ -269,8 +294,8 @@ const ScanMedicine = () => {
 
                                                 {barcodePreview ? (
                                                     <div className="scan-barcode-preview" onClick={() => barcodeFileRef.current?.click()} style={{ cursor: 'pointer' }}>
-                                                        <img src={barcodePreview} alt="Barcode" />
-                                                        <div className="preview-overlay">Click to change image</div>
+                                                        <img src={barcodePreview} alt={t('scan.col_barcode')} />
+                                                        <div className="preview-overlay">{t('scan.click_change')}</div>
                                                     </div>
                                                 ) : (
                                                     <button
@@ -279,26 +304,26 @@ const ScanMedicine = () => {
                                                         type="button"
                                                     >
                                                         <ScanLine size={40} className="upload-icon" />
-                                                        <span>Choose File / Take Image</span>
+                                                        <span>{t('scan.choose_file')}</span>
                                                     </button>
                                                 )}
 
                                                 <div className="scan-divider">
                                                     <div className="scan-divider-line"></div>
-                                                    <span className="scan-divider-text">or manually</span>
+                                                    <span className="scan-divider-text">{t('scan.or_manually')}</span>
                                                     <div className="scan-divider-line"></div>
                                                 </div>
 
                                                 <input
                                                     type="number"
                                                     className="scan-barcode-input"
-                                                    placeholder="890123... (Barcode)"
+                                                    placeholder={t('scan.barcode_placeholder')}
                                                     value={barcode}
                                                     onChange={(e) => setBarcode(e.target.value)}
                                                 />
                                                 {barcode.trim() && (
                                                     <button onClick={handleScanBarcode} className="scan-btn-green" type="button">
-                                                        Search Barcode
+                                                        {t('scan.search_barcode')}
                                                     </button>
                                                 )}
                                             </div>
@@ -311,11 +336,11 @@ const ScanMedicine = () => {
                                             <div>
                                                 {photoPreview && (
                                                     <div className="scan-photo-preview" style={{ marginBottom: '1rem' }}>
-                                                        <img src={photoPreview} alt="Medicine photo" />
-                                                        <div className="preview-overlay">Analyzing Photo...</div>
+                                                        <img src={photoPreview} alt={t('scan.col_photo')} />
+                                                        <div className="preview-overlay">{t('scan.analyzing_photo')}</div>
                                                     </div>
                                                 )}
-                                                <SectionLoader message="Identifying medicine..." />
+                                                <SectionLoader message={t('scan.identifying')} />
                                             </div>
                                         ) : (
                                             <div className="scan-photo-col">
@@ -330,8 +355,8 @@ const ScanMedicine = () => {
 
                                                 {photoPreview ? (
                                                     <div className="scan-photo-preview" onClick={() => photoFileRef.current?.click()} style={{ cursor: 'pointer' }}>
-                                                        <img src={photoPreview} alt="Medicine" />
-                                                        <div className="preview-overlay">Click to change photo</div>
+                                                        <img src={photoPreview} alt={t('scan.col_photo')} />
+                                                        <div className="preview-overlay">{t('scan.click_change_photo')}</div>
                                                     </div>
                                                 ) : (
                                                     <div
@@ -339,8 +364,8 @@ const ScanMedicine = () => {
                                                         className="scan-photo-placeholder"
                                                     >
                                                         <Pill size={60} className="photo-pill-icon" />
-                                                        <p className="photo-text-main">Upload Photo</p>
-                                                        <p className="photo-text-sub">Visual AI Identification</p>
+                                                        <p className="photo-text-main">{t('scan.upload_photo')}</p>
+                                                        <p className="photo-text-sub">{t('scan.visual_ai')}</p>
                                                     </div>
                                                 )}
 
@@ -350,7 +375,7 @@ const ScanMedicine = () => {
                                                     type="button"
                                                 >
                                                     <Camera size={20} />
-                                                    Capture Medicine
+                                                    {t('scan.capture')}
                                                 </button>
                                             </div>
                                         )}
@@ -366,7 +391,7 @@ const ScanMedicine = () => {
                     <div className="scan-error">
                         <AlertCircle size={36} className="scan-error-icon" />
                         <div>
-                            <h4>Could not find that</h4>
+                            <h4>{t('scan.not_found')}</h4>
                             <p>{error}</p>
                         </div>
                     </div>
@@ -376,7 +401,7 @@ const ScanMedicine = () => {
                 {result && (
                     <div className="scan-results">
                         <button onClick={handleReset} className="scan-back-btn" type="button">
-                            <ArrowLeft size={18} /> New Search
+                            <ArrowLeft size={18} /> {t('scan.new_search')}
                         </button>
 
                         <div className="scan-result-card">
@@ -386,14 +411,14 @@ const ScanMedicine = () => {
                                 </div>
                                 <div className="scan-result-header-content">
                                     <div>
-                                        <span className="scan-result-badge">AI Verification Successful</span>
+                                        <span className="scan-result-badge">{t('scan.ai_verified')}</span>
                                         <h2 className="scan-result-name">{result.medicine_name}</h2>
                                         {result.composition && (
                                             <div className="scan-result-composition">{result.composition}</div>
                                         )}
                                     </div>
                                     <button
-                                        onClick={() => speakText(`${result.medicine_name}. Usage: ${result.usage}. Dosage: ${result.dosage}.`)}
+                                        onClick={() => speakText(buildFullMedicineSpeech(result))}
                                         className="scan-speak-btn"
                                         type="button"
                                     >
@@ -406,17 +431,17 @@ const ScanMedicine = () => {
                                 <div className="scan-info-card blue">
                                     <div className="scan-info-card-header">
                                         <div className="scan-info-card-icon blue"><Info size={24} /></div>
-                                        <h3 className="blue">Primary Use</h3>
+                                        <h3 className="blue">{t('scan.primary_use')}</h3>
                                     </div>
-                                    <p className="info-text">{result.usage || "Unknown"}</p>
+                                    <p className="info-text">{result.usage || t('scan.unknown')}</p>
                                 </div>
 
                                 <div className="scan-info-card green">
                                     <div className="scan-info-card-header">
                                         <div className="scan-info-card-icon green"><CheckCircle size={24} /></div>
-                                        <h3 className="green">Standard Dose</h3>
+                                        <h3 className="green">{t('scan.standard_dose')}</h3>
                                     </div>
-                                    <p className="info-text-lg">{result.dosage || "Refer to doctor"}</p>
+                                    <p className="info-text-lg">{result.dosage || t('scan.refer_doctor')}</p>
                                     {result.usage_instructions && (
                                         <div className="info-instructions">{result.usage_instructions}</div>
                                     )}
@@ -425,20 +450,20 @@ const ScanMedicine = () => {
                                 <div className="scan-info-card amber-wide">
                                     <div className="scan-info-card-header">
                                         <div className="scan-info-card-icon amber"><AlertTriangle size={24} /></div>
-                                        <h3 className="amber">Safety & Warnings</h3>
+                                        <h3 className="amber">{t('scan.safety')}</h3>
                                     </div>
                                     <div className="scan-warnings-grid">
                                         <div className="scan-warning-item">
-                                            <span className="warning-label effects">🤧 Side Effects</span>
-                                            <p>{result.side_effects || "None reported"}</p>
+                                            <span className="warning-label effects">🤧 {t('scan.side_effects')}</span>
+                                            <p>{result.side_effects || t('scan.none_reported')}</p>
                                         </div>
                                         <div className="scan-warning-item">
-                                            <span className="warning-label precautions">⛔ Precautions</span>
-                                            <p>{result.precautions || "Standard safety rules"}</p>
+                                            <span className="warning-label precautions">⛔ {t('dashboard.precautions')}</span>
+                                            <p>{result.precautions || t('scan.standard_safety')}</p>
                                         </div>
                                         <div className="scan-warning-item">
-                                            <span className="warning-label missed">⏰ Missed Dose</span>
-                                            <p>{result.missed_dose_guidelines || "Take as remembered"}</p>
+                                            <span className="warning-label missed">⏰ {t('scan.missed_dose')}</span>
+                                            <p>{result.missed_dose_guidelines || t('scan.take_as_remembered')}</p>
                                         </div>
                                     </div>
                                 </div>
