@@ -12,6 +12,7 @@ const Dashboard = () => {
     const [expandedIds, setExpandedIds] = useState([]);
     const [detailedData, setDetailedData] = useState({});
     const [loadingDetails, setLoadingDetails] = useState(false);
+    const [currentDomain, setCurrentDomain] = useState(localStorage.getItem('selectedConcern') || 'allopathy');
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -28,7 +29,14 @@ const Dashboard = () => {
         };
 
         fetchPrescriptions();
-    }, [speakText]);
+    }, [speakText, currentDomain]);
+
+    const handleDomainChange = (e) => {
+        const newDomain = e.target.value;
+        localStorage.setItem('selectedConcern', newDomain);
+        setCurrentDomain(newDomain);
+        speakText(`Domain changed to ${newDomain}`);
+    };
 
     const toggleExpand = async (id) => {
         if (expandedIds.includes(id)) {
@@ -54,14 +62,34 @@ const Dashboard = () => {
 
     return (
         <div className="container py-8 animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1>{t('dashboard.title')}</h1>
                     <p className="text-secondary text-lg">{t('dashboard.welcome', { name: user?.name || 'User' })}</p>
                 </div>
-                <Link to="/upload" className="btn btn-primary" onMouseEnter={() => speakText("Scan a new prescription")}>
-                    {t('dashboard.scan_new')}
-                </Link>
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+                    <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 w-full md:w-auto">
+                        <label className="text-secondary font-medium whitespace-nowrap text-sm">Active Domain:</label>
+                        <select
+                            value={currentDomain}
+                            onChange={handleDomainChange}
+                            className="bg-transparent border-none outline-none font-bold text-primary cursor-pointer w-full md:w-auto"
+                            style={{ fontSize: '1rem', minWidth: '130px' }}
+                        >
+                            <option value="ayurvedic">Ayurvedic</option>
+                            <option value="homeopathy">Homeopathy</option>
+                            <option value="allopathy">Allopathy</option>
+                            <option value="cardiologist">Cardiologist</option>
+                            <option value="neurological">Neurological</option>
+                            <option value="orthopedic">Orthopedic</option>
+                            <option value="pediatric">Pediatric</option>
+                            <option value="other">Other Speciality</option>
+                        </select>
+                    </div>
+                    <Link to="/upload" className="btn btn-primary w-full md:w-auto whitespace-nowrap" onMouseEnter={() => speakText("Scan a new prescription")}>
+                        {t('dashboard.scan_new')}
+                    </Link>
+                </div>
             </div>
 
             {loading ? (

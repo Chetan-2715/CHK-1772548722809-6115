@@ -40,6 +40,10 @@ class UserUpdate(BaseModel):
     accessibility_high_contrast: bool | None = None
     accessibility_voice: bool | None = None
     medical_profile: dict | None = None
+    caretaker_name: str | None = None
+    caretaker_email: EmailStr | str | None = None
+    caretaker_phone: str | None = None
+    caretaker_relation: str | None = None
 
 
 class Token(BaseModel):
@@ -102,6 +106,10 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
             "age": new_user.age,
             "phone": new_user.phone,
             "medical_profile": new_user.medical_profile,
+            "caretaker_name": new_user.caretaker_name,
+            "caretaker_email": new_user.caretaker_email,
+            "caretaker_phone": new_user.caretaker_phone,
+            "caretaker_relation": new_user.caretaker_relation,
         }
     )
 
@@ -134,6 +142,10 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
             "accessibility_large_font": user.accessibility_large_font,
             "accessibility_high_contrast": user.accessibility_high_contrast,
             "accessibility_voice": user.accessibility_voice,
+            "caretaker_name": user.caretaker_name,
+            "caretaker_email": user.caretaker_email,
+            "caretaker_phone": user.caretaker_phone,
+            "caretaker_relation": user.caretaker_relation,
         }
     )
 
@@ -166,27 +178,30 @@ async def update_profile(
     if user_update.accessibility_voice is not None:
         user.accessibility_voice = user_update.accessibility_voice
     if user_update.medical_profile is not None:
-        old_profile = user.medical_profile or {}
-        new_profile = user_update.medical_profile
-        
-        old_caretaker_email = old_profile.get("caretaker", {}).get("email")
-        new_caretaker = new_profile.get("caretaker", {})
-        new_caretaker_email = new_caretaker.get("email")
-        new_caretaker_name = new_caretaker.get("name", "Caretaker")
-        
-        if new_caretaker_email and new_caretaker_email != old_caretaker_email:
+        user.medical_profile = user_update.medical_profile
+
+    # Handle explicit caretaker fields
+    if user_update.caretaker_name is not None:
+        user.caretaker_name = user_update.caretaker_name
+    if user_update.caretaker_phone is not None:
+        user.caretaker_phone = user_update.caretaker_phone
+    if user_update.caretaker_relation is not None:
+        user.caretaker_relation = user_update.caretaker_relation
+    
+    # If the caretaker email changed, we send them a notification email
+    if user_update.caretaker_email is not None:
+        if user_update.caretaker_email != user.caretaker_email and user_update.caretaker_email != "":
             try:
                 from services.email_service import send_caretaker_email
                 send_caretaker_email(
-                    caretaker_email=new_caretaker_email,
-                    caretaker_name=new_caretaker_name,
+                    caretaker_email=user_update.caretaker_email,
+                    caretaker_name=user_update.caretaker_name or user.caretaker_name or "Caretaker",
                     patient_name=user.name,
                     patient_email=user.email
                 )
             except Exception as e:
                 print(f"Failed to send email: {e}")
-
-        user.medical_profile = new_profile
+        user.caretaker_email = user_update.caretaker_email
 
     db.commit()
     return {"message": "Profile updated successfully"}
@@ -215,4 +230,8 @@ async def get_profile(
         "accessibility_large_font": user.accessibility_large_font,
         "accessibility_high_contrast": user.accessibility_high_contrast,
         "accessibility_voice": user.accessibility_voice,
+        "caretaker_name": user.caretaker_name,
+        "caretaker_email": user.caretaker_email,
+        "caretaker_phone": user.caretaker_phone,
+        "caretaker_relation": user.caretaker_relation,
     }

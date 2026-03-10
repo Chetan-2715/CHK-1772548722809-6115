@@ -11,6 +11,11 @@ CREATE TABLE IF NOT EXISTS users (
     accessibility_large_font BOOLEAN DEFAULT FALSE,
     accessibility_high_contrast BOOLEAN DEFAULT FALSE,
     accessibility_voice BOOLEAN DEFAULT FALSE,
+    medical_profile JSONB,
+    caretaker_name VARCHAR(100),
+    caretaker_email VARCHAR(255),
+    caretaker_phone VARCHAR(20),
+    caretaker_relation VARCHAR(50),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ
 );

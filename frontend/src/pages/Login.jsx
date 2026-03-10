@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppContext } from '../App';
 import { authAPI } from '../services/api';
-import { User, Lock, Mail, Phone, Activity, AlertTriangle } from 'lucide-react';
+import { User, Lock, Mail, Phone, AlertTriangle } from 'lucide-react';
 import PatientForm from '../components/PatientForm';
 
 const Login = () => {
@@ -84,7 +84,11 @@ const Login = () => {
         <div className="login-container flex justify-center items-center" style={{ minHeight: '70vh' }}>
             <div className="card card-glass w-full animate-slide-up" style={{ maxWidth: '500px' }}>
                 <div className="text-center mb-6">
-                    <Activity size={48} color="var(--primary-color)" className="pulse-animation-slow" style={{ margin: '0 auto', marginBottom: '1rem' }} />
+                    <img
+                        src="/image.png"
+                        alt="Scan4Elders Logo"
+                        style={{ width: '72px', height: 'auto', margin: '0 auto', marginBottom: '1rem', display: 'block', objectFit: 'contain' }}
+                    />
                     <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
                     <p className="text-secondary">
                         {isLogin ? 'Enter your details to access your account' : 'Join Scan4Elders for a safer medication journey'}

@@ -122,110 +122,161 @@ const ScanMedicine = () => {
     };
 
     return (
-        <div className="container py-8 animate-fade-in">
-            <div className="text-center mb-8">
-                <h1>Medicine Lookup</h1>
-                <p className="text-secondary" style={{ fontSize: '1.125rem' }}>
-                    Search by name, enter a QR code, or upload a photo to learn about any medicine.
-                </p>
-            </div>
+        <div className="container animate-fade-in flex flex-col justify-center" style={{ minHeight: '85vh', padding: '2rem 1rem' }}>
+            <div className="w-full max-w-4xl mx-auto flex flex-col gap-6 w-full pb-12">
 
-            <div className="card card-glass mb-8 p-0 overflow-hidden" style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <div className="flex" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <button
-                        className={`flex-1 py-4 text-center font-bold text-lg transition-colors border-none cursor-pointer ${activeTab === 'search' ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'bg-transparent text-slate-500 hover:bg-slate-50'}`}
-                        onClick={() => { setActiveTab('search'); setResult(null); setError(''); speakText("Switched to Search by Name"); }}
-                    >
-                        <Search className="inline-block mr-2 align-text-bottom" size={20} /> Name
-                    </button>
-                    <button
-                        className={`flex-1 py-4 text-center font-bold text-lg transition-colors border-none cursor-pointer ${activeTab === 'scan' ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'bg-transparent text-slate-500 hover:bg-slate-50'}`}
-                        onClick={() => { setActiveTab('scan'); setResult(null); setError(''); speakText("Switched to Manual QR Code"); }}
-                    >
-                        <ScanLine className="inline-block mr-2 align-text-bottom" size={20} /> QR Code
-                    </button>
-                    <button
-                        className={`flex-1 py-4 text-center font-bold text-lg transition-colors border-none cursor-pointer ${activeTab === 'upload' ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'bg-transparent text-slate-500 hover:bg-slate-50'}`}
-                        onClick={() => { setActiveTab('upload'); setResult(null); setError(''); speakText("Switched to Photo Upload"); }}
-                    >
-                        <Camera className="inline-block mr-2 align-text-bottom" size={20} /> Photo
-                    </button>
+                {/* Compartment 1: Search by Name */}
+                <div
+                    className={`border-2 rounded-3xl transition-all overflow-hidden ${activeTab === 'search' ? 'border-primary shadow-xl bg-white' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:shadow-md cursor-pointer'}`}
+                    onClick={() => { if (activeTab !== 'search') { setActiveTab('search'); setResult(null); setError(''); speakText("Switched to Search by Name"); } }}
+                >
+                    <div className="p-6 md:p-8 flex items-center justify-between">
+                        <h2 className={`m-0 text-2xl md:text-3xl ${activeTab === 'search' ? 'font-black text-slate-900' : 'font-bold text-slate-500'}`}>Search by Name</h2>
+                        {activeTab !== 'search' && <div className="text-slate-400 font-bold text-xl">+</div>}
+                        {activeTab === 'search' && <div className="text-primary font-bold text-xl">-</div>}
+                    </div>
+
+                    {activeTab === 'search' && (
+                        <div className="px-6 md:px-8 pb-8 pt-2 animate-slide-up border-t border-slate-100">
+                            <form onSubmit={handleSearch} className="w-full flex flex-col items-start mt-4">
+                                <div className="relative w-full mb-6 flex items-center">
+                                    <Search className="absolute left-6 text-slate-800" size={32} />
+                                    <input
+                                        type="text"
+                                        className="w-full m-0 border-2 border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary-light outline-none"
+                                        placeholder="Enter name of medicine..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        style={{ fontSize: '1.5rem', padding: '1.5rem 1.5rem 1.5rem 5rem', borderRadius: '1rem', backgroundColor: 'transparent', transition: 'all 0.2s' }}
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all" style={{ padding: '1rem 3rem', borderRadius: '0.75rem', fontSize: '1.25rem' }} disabled={loading || !searchTerm.trim()}>
+                                    {loading ? <div className="spinner border-white mini"></div> : <span className="font-bold">Search</span>}
+                                </button>
+                            </form>
+                        </div>
+                    )}
                 </div>
 
-                <div className="p-6">
-                    {activeTab === 'search' && (
-                        <form onSubmit={handleSearch} className="flex gap-4">
-                            <input
-                                type="text"
-                                className="input flex-1"
-                                placeholder="e.g. Paracetamol, Aspirin..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{ fontSize: '1.25rem', padding: '1rem' }}
-                            />
-                            <button type="submit" className="btn btn-primary px-8" disabled={loading || !searchTerm.trim()}>
-                                {loading ? <div className="spinner" style={{ width: '20px', height: '20px' }}></div> : <Search size={24} />}
-                            </button>
-                        </form>
-                    )}
+                {/* Compartment 2: Search by QR */}
+                <div
+                    className={`border-2 rounded-3xl transition-all overflow-hidden ${activeTab === 'scan' ? 'border-primary shadow-xl bg-white' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:shadow-md cursor-pointer'}`}
+                    onClick={() => { if (activeTab !== 'scan') { setActiveTab('scan'); setResult(null); setError(''); speakText("Switched to Search by QR"); } }}
+                >
+                    <div className="p-6 md:p-8 flex items-center justify-between">
+                        <h2 className={`m-0 text-2xl md:text-3xl ${activeTab === 'scan' ? 'font-black text-slate-900' : 'font-bold text-slate-500'}`}>Search by QR</h2>
+                        {activeTab !== 'scan' && <div className="text-slate-400 font-bold text-xl">+</div>}
+                        {activeTab === 'scan' && <div className="text-primary font-bold text-xl">-</div>}
+                    </div>
 
                     {activeTab === 'scan' && (
-                        <form onSubmit={handleScanBarcode} className="flex gap-4">
-                            <input
-                                type="text"
-                                className="input flex-1"
-                                placeholder="Enter numbers under QR code..."
-                                value={barcode}
-                                onChange={(e) => setBarcode(e.target.value)}
-                                style={{ fontSize: '1.25rem', padding: '1rem' }}
-                            />
-                            <button type="submit" className="btn btn-secondary px-8" disabled={loading || !barcode.trim()}>
-                                {loading ? <div className="spinner" style={{ width: '20px', height: '20px' }}></div> : <ScanLine size={24} />}
-                            </button>
-                        </form>
-                    )}
+                        <div className="px-6 md:px-8 pb-8 pt-2 animate-slide-up border-t border-slate-100">
+                            <div className="flex flex-col items-start w-full mt-4">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    capture="environment"
+                                    ref={fileInputRef}
+                                    onChange={handleImageUpload}
+                                    style={{ display: 'none' }}
+                                />
 
-                    {activeTab === 'upload' && (
-                        <div className="text-center py-4">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                capture="environment"
-                                ref={fileInputRef}
-                                onChange={handleImageUpload}
-                                style={{ display: 'none' }}
-                            />
-                            <button
-                                type="button"
-                                className="btn btn-primary btn-lg pulse-animation"
-                                onClick={() => fileInputRef.current?.click()}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <span className="flex items-center gap-2"><div className="spinner" style={{ width: '20px', height: '20px' }}></div> Processing Image...</span>
-                                ) : (
-                                    <span className="flex items-center gap-2"><Camera size={24} /> Open Camera or Gallery</span>
-                                )}
-                            </button>
-                            <p className="mt-4 text-secondary">
-                                Take a picture of the medicine box, QR code, or the tablet itself.
-                            </p>
-                        </div>
-                    )}
+                                <div className="w-full mb-10 flex flex-col items-start">
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+                                        style={{ padding: '1.25rem 3rem', fontSize: '1.5rem', borderRadius: '1rem' }}
+                                        onClick={() => fileInputRef.current?.click()}
+                                        disabled={loading}
+                                    >
+                                        {loading ? (
+                                            <><div className="spinner border-white mini"></div> Scanning Label...</>
+                                        ) : (
+                                            <><span className="font-bold">Scan QR Code</span></>
+                                        )}
+                                    </button>
+                                </div>
 
-                    {error && (
-                        <div className="mt-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-start gap-3">
-                            <AlertCircle size={24} className="flex-shrink-0 mt-1" />
-                            <p className="font-medium text-lg m-0">{error}</p>
+                                <div className="w-full border-t border-slate-200 pt-8 flex flex-col items-start">
+                                    <p className="text-secondary mb-4 font-semibold text-sm uppercase tracking-widest text-slate-400">Or type the barcode number</p>
+
+                                    <form onSubmit={handleScanBarcode} className="w-full flex flex-col items-start">
+                                        <div className="relative w-full mb-6 flex items-center">
+                                            <ScanLine className="absolute left-6 text-slate-800" size={32} />
+                                            <input
+                                                type="text"
+                                                className="w-full m-0 border-2 border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary-light outline-none"
+                                                placeholder="Enter the 12-digit number..."
+                                                value={barcode}
+                                                onChange={(e) => setBarcode(e.target.value)}
+                                                style={{ fontSize: '1.5rem', padding: '1.5rem 1.5rem 1.5rem 5rem', borderRadius: '1rem', backgroundColor: 'transparent', transition: 'all 0.2s' }}
+                                            />
+                                        </div>
+                                        <button type="submit" className="btn btn-primary shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all" style={{ padding: '1rem 3rem', borderRadius: '0.75rem', fontSize: '1.25rem' }} disabled={loading || !barcode.trim()}>
+                                            {loading ? <div className="spinner border-white mini"></div> : <span className="font-bold">Search</span>}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
+
+                {/* Compartment 3: Search by Photo */}
+                <div
+                    className={`border-2 rounded-3xl transition-all overflow-hidden ${activeTab === 'upload' ? 'border-primary shadow-xl bg-white' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:shadow-md cursor-pointer'}`}
+                    onClick={() => { if (activeTab !== 'upload') { setActiveTab('upload'); setResult(null); setError(''); speakText("Switched to Search by Photo"); } }}
+                >
+                    <div className="p-6 md:p-8 flex items-center justify-between">
+                        <h2 className={`m-0 text-2xl md:text-3xl ${activeTab === 'upload' ? 'font-black text-slate-900' : 'font-bold text-slate-500'}`}>Search by Photo</h2>
+                        {activeTab !== 'upload' && <div className="text-slate-400 font-bold text-xl">+</div>}
+                        {activeTab === 'upload' && <div className="text-primary font-bold text-xl">-</div>}
+                    </div>
+
+                    {activeTab === 'upload' && (
+                        <div className="px-6 md:px-8 pb-8 pt-2 animate-slide-up border-t border-slate-100">
+                            <div className="w-full flex flex-col items-start mt-4">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    capture="environment"
+                                    ref={fileInputRef}
+                                    onChange={handleImageUpload}
+                                    style={{ display: 'none' }}
+                                />
+                                <button
+                                    type="button"
+                                    className="btn btn-outline text-slate-800 border-2 border-slate-300 hover:border-primary hover:text-primary hover:bg-primary-light transition-all font-bold group"
+                                    style={{ padding: '1.5rem 3rem', borderRadius: '1rem', fontSize: '1.5rem' }}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <span className="flex items-center justify-center gap-3"><div className="spinner border-slate-800 group-hover:border-primary mini"></div> Processing Photo...</span>
+                                    ) : (
+                                        <span className="flex items-center justify-center gap-3"><Camera size={32} className="group-hover:text-primary transition-colors" /> Upload a Photo</span>
+                                    )}
+                                </button>
+                                <p className="mt-8 text-slate-500 font-medium text-lg border-l-4 border-slate-300 pl-4 py-1">
+                                    Capture the front of the medicine box or the pill itself. Make sure the text is clearly visible.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {error && (
+                    <div className="mt-4 p-5 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 flex items-start gap-4 w-full shadow-sm">
+                        <AlertCircle size={32} className="flex-shrink-0 mt-1" />
+                        <p className="font-bold text-xl m-0 leading-snug">{error}</p>
+                    </div>
+                )}
             </div>
 
             {result && (
-                <div className="card shadow-lg animate-slide-up" style={{ maxWidth: '800px', margin: '0 auto', borderTop: '4px solid var(--primary-color)' }}>
-                    <div className="flex justify-between items-center mb-6 pb-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
-                        <h2 className="m-0 text-3xl text-primary">{result.medicine_name}</h2>
+                <div className="card shadow-2xl animate-slide-up bg-white rounded-2xl border-0 overflow-hidden" style={{ maxWidth: '850px', margin: '0 auto', borderTop: '6px solid var(--primary-color)' }}>
+                    <div className="flex justify-between items-center mb-6 pb-4 bg-slate-50 p-6 -mx-6 -mt-6">
+                        <h2 className="m-0 text-3xl font-extrabold text-slate-800">{result.medicine_name}</h2>
                         <button className="btn btn-ghost p-2 rounded-full hover:bg-slate-100" onClick={() => speakText(`Information for ${result.medicine_name}. Usage: ${result.usage}.`)}>
                             🔊 Listen
                         </button>
@@ -266,8 +317,9 @@ const ScanMedicine = () => {
                         )}
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

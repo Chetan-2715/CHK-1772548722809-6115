@@ -36,7 +36,7 @@ const Home = () => {
                 </div>
 
                 <div className="hero-visual">
-                    <div className="glass-mockup pulse-animation-slow">
+                    <div className="glass-mockup">
                         <div className="mockup-header">
                             <ShieldCheck size={28} color="var(--success-color)" />
                             <span>{t('home.verified_safe')}</span>
@@ -45,7 +45,7 @@ const Home = () => {
                             <div className="skeleton-line full"></div>
                             <div className="skeleton-line half"></div>
                             <div className="pill-container">
-                                <div className="pill pulse-animation"></div>
+                                <div className="pill"></div>
                                 <div className="pill-text">Paracetamol 500mg</div>
                             </div>
                         </div>

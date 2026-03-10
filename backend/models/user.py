@@ -17,6 +17,10 @@ class User(Base):
     accessibility_high_contrast = Column(Boolean, default=False)
     accessibility_voice = Column(Boolean, default=False)
     medical_profile = Column(JSON, nullable=True)
+    caretaker_name = Column(String(100), nullable=True)
+    caretaker_email = Column(String(255), nullable=True)
+    caretaker_phone = Column(String(20), nullable=True)
+    caretaker_relation = Column(String(50), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

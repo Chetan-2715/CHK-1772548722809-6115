@@ -5,7 +5,7 @@ import { CheckCircle, AlertTriangle, User, SkipForward, Save, Lock } from 'lucid
 import './PatientForm.css';
 
 const PatientForm = ({ onComplete }) => {
-    const { user, speakText } = useContext(AppContext);
+    const { user, speakText, updateUser } = useContext(AppContext);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -144,6 +144,10 @@ const PatientForm = ({ onComplete }) => {
         try {
             // Attempt to save to backend if user logic applies
             await authAPI.updateProfile({ medical_profile: formData }).catch(e => console.warn('Bypassed backend save restriction'));
+
+            if (updateUser && user) {
+                updateUser({ ...user, medical_profile: formData });
+            }
 
             // Unconditionally route the user to the Select Concern page
             setSuccess(true);

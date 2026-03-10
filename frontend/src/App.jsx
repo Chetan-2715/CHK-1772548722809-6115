@@ -88,6 +88,11 @@ function App() {
         localStorage.setItem('token', userData.token); // Assume returned in userData
     };
 
+    const updateUser = (newUserData) => {
+        setUser(newUserData);
+        localStorage.setItem('user', JSON.stringify(newUserData));
+    };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('user');
@@ -98,6 +103,7 @@ function App() {
         user,
         login,
         logout,
+        updateUser,
         theme,
         setTheme,
         fontSize,

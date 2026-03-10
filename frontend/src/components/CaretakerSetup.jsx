@@ -4,7 +4,7 @@ import { authAPI } from '../services/api';
 import { Save, AlertTriangle, CheckCircle, UserPlus } from 'lucide-react';
 
 const CaretakerSetup = () => {
-    const { user, speakText } = useContext(AppContext);
+    const { user, speakText, updateUser } = useContext(AppContext);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -17,8 +17,13 @@ const CaretakerSetup = () => {
     });
 
     useEffect(() => {
-        if (user?.medical_profile?.caretaker) {
-            setCaretaker(user.medical_profile.caretaker);
+        if (user) {
+            setCaretaker({
+                name: user.caretaker_name || '',
+                email: user.caretaker_email || '',
+                phone: user.caretaker_phone || '',
+                relation: user.caretaker_relation || ''
+            });
         }
     }, [user]);
 
@@ -31,11 +36,25 @@ const CaretakerSetup = () => {
         setError('');
         setSuccess(false);
         try {
-            const currentProfile = user?.medical_profile || {};
-            const updatedProfile = { ...currentProfile, caretaker };
-            await authAPI.updateProfile({ medical_profile: updatedProfile });
+            const explicitUpdate = {
+                caretaker_name: caretaker.name,
+                caretaker_email: caretaker.email,
+                caretaker_phone: caretaker.phone,
+                caretaker_relation: caretaker.relation,
+            };
+            await authAPI.updateProfile(explicitUpdate);
 
-            // Optionally update user context here if needed
+            // Update user context here
+            if (updateUser) {
+                updateUser({
+                    ...user,
+                    caretaker_name: caretaker.name,
+                    caretaker_email: caretaker.email,
+                    caretaker_phone: caretaker.phone,
+                    caretaker_relation: caretaker.relation
+                });
+            }
+
             setSuccess(true);
             speakText("Caretaker information saved. They will receive an email shortly.");
             setTimeout(() => setSuccess(false), 4000);
