@@ -1,10 +1,7 @@
-import React, { useState, useContext, useRef, useCallback } from 'react';
-import { Search, ScanLine, Camera, Info, CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
+import React, { useState, useContext, useRef } from 'react';
+import { Search, ScanLine, Camera, Info, CheckCircle, AlertTriangle, AlertCircle, Volume2, ArrowLeft, RefreshCw } from 'lucide-react';
 import { AppContext } from '../App';
 import { medicineAPI } from '../services/api';
-// Normally we'd use react-qr-barcode-scanner here, but integrating it perfectly requires 
-// specific DOM setup, so we provide an interface that uses file uploads or manual entry 
-// as robust fallbacks, which aligns with senior-friendly inclusive design.
 
 const ScanMedicine = () => {
     const [activeTab, setActiveTab] = useState('search'); // search, scan, upload
@@ -18,6 +15,14 @@ const ScanMedicine = () => {
 
     const { speakText } = useContext(AppContext);
     const fileInputRef = useRef(null);
+
+    const handleReset = () => {
+        setResult(null);
+        setError('');
+        setSearchTerm('');
+        setBarcode('');
+        speakText("Ready to search again");
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -34,7 +39,7 @@ const ScanMedicine = () => {
                 setResult(res.data.data);
                 speakText(`Found information for ${res.data.data.medicine_name}`);
             } else {
-                setError(res.data.error || 'Medicine not found');
+                setError(res.data.error || 'Medicine not found. Please check the spelling.');
                 speakText("Medicine not found");
             }
         } catch (err) {
@@ -53,16 +58,16 @@ const ScanMedicine = () => {
         setLoading(true);
         setError('');
         setResult(null);
-        speakText(`Looking up QR code ${barcode}`);
+        speakText(`Looking up barcode number ${barcode}`);
 
         try {
             const res = await medicineAPI.scanBarcode({ barcode });
             if (res.data.success) {
                 setResult(res.data.data);
-                speakText(`Found medicine for this QR code: ${res.data.data.medicine_name}`);
+                speakText(`Found medicine: ${res.data.data.medicine_name}`);
             } else {
-                setError(res.data.message || 'QR code not found in database');
-                speakText("QR code not found in database");
+                setError(res.data.message || 'Barcode not found in database');
+                speakText("Barcode not found in database");
             }
         } catch (err) {
             const msg = err.response?.data?.detail || "An error occurred";
@@ -81,31 +86,29 @@ const ScanMedicine = () => {
         setLoading(true);
         setError('');
         setResult(null);
-        speakText("Analyzing image");
+        speakText("Analyzing image, please wait");
 
         const formData = new FormData();
         formData.append('file', selectedFile);
 
         try {
-            // First try to extract barcode from image
             const res = await medicineAPI.scanBarcodeImage(formData);
 
             if (res.data.success !== false && res.data.lookup_result?.success) {
                 setResult(res.data.lookup_result.data);
                 setBarcode(res.data.barcode);
-                speakText(`Found QR code. Identified as ${res.data.lookup_result.data.medicine_name}`);
+                speakText(`Success. Identified as ${res.data.lookup_result.data.medicine_name}`);
             } else {
-                // Fallback: Verify tablet visually
-                speakText("Could not find QR code, trying visual identification");
+                speakText("Could not find barcode, trying visual identification");
                 const verifyRes = await medicineAPI.verifyTabletImage(formData);
 
                 if (verifyRes.data.success) {
-                    setError('Visual Identify: ' + verifyRes.data.message);
                     if (verifyRes.data.medicine_info) {
                         setResult(verifyRes.data.medicine_info);
                         speakText("Identified visually: " + verifyRes.data.medicine_info.medicine_name);
                     } else {
-                        speakText("Image processed, check results.");
+                        setError('Could not fully identify. ' + verifyRes.data.message);
+                        speakText("Could not fully identify the medicine.");
                     }
                 } else {
                     setError(verifyRes.data.error || "Could not identify medicine from image");
@@ -113,213 +116,216 @@ const ScanMedicine = () => {
                 }
             }
         } catch (err) {
-            const msg = err.response?.data?.detail || err.response?.data?.message || err.message || "An error occurred";
-            setError(msg);
+            setError("Network or processing error occurred while analyzing the image.");
             speakText(`Error computing image`);
         } finally {
             setLoading(false);
         }
     };
 
+    // UI Components for Tabs
+    const TabButton = ({ id, icon: Icon, label }) => (
+        <button
+            onClick={() => { setActiveTab(id); speakText(`Selected ${label}`); }}
+            className={`flex-1 flex flex-col items-center justify-center py-6 px-4 rounded-3xl transition-all duration-300 border-2 
+                ${activeTab === id
+                    ? 'bg-primary text-white border-primary shadow-primary scale-[1.02]'
+                    : 'bg-white text-slate-500 border-slate-100 hover:border-primary-light hover:bg-slate-50 shadow-sm hover:shadow-md'}`}
+        >
+            <div className={`p-4 rounded-2xl mb-3 ${activeTab === id ? 'bg-white/20' : 'bg-primary-light'}`}>
+                <Icon size={32} className={`${activeTab === id ? 'text-white' : 'text-primary'}`} />
+            </div>
+            <span className="font-bold text-lg tracking-tight transition-colors">{label}</span>
+        </button>
+    );
+
     return (
-        <div className="container animate-fade-in flex flex-col justify-center" style={{ minHeight: '85vh', padding: '2rem 1rem' }}>
-            <div className="w-full max-w-4xl mx-auto flex flex-col gap-6 w-full pb-12">
+        <div className="min-h-[85vh] bg-slate-50 p-4 md:p-8 animate-fade-in">
+            <div className="max-w-3xl mx-auto flex flex-col gap-8">
 
-                {/* Compartment 1: Search by Name */}
-                <div
-                    className={`border-2 rounded-3xl transition-all overflow-hidden ${activeTab === 'search' ? 'border-primary shadow-xl bg-white' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:shadow-md cursor-pointer'}`}
-                    onClick={() => { if (activeTab !== 'search') { setActiveTab('search'); setResult(null); setError(''); speakText("Switched to Search by Name"); } }}
-                >
-                    <div className="p-6 md:p-8 flex items-center justify-between">
-                        <h2 className={`m-0 text-2xl md:text-3xl ${activeTab === 'search' ? 'font-black text-slate-900' : 'font-bold text-slate-500'}`}>Search by Name</h2>
-                        {activeTab !== 'search' && <div className="text-slate-400 font-bold text-xl">+</div>}
-                        {activeTab === 'search' && <div className="text-primary font-bold text-xl">-</div>}
-                    </div>
-
-                    {activeTab === 'search' && (
-                        <div className="px-6 md:px-8 pb-8 pt-2 animate-slide-up border-t border-slate-100">
-                            <form onSubmit={handleSearch} className="w-full flex flex-col items-start mt-4">
-                                <div className="relative w-full mb-6 flex items-center">
-                                    <Search className="absolute left-6 text-slate-800" size={32} />
-                                    <input
-                                        type="text"
-                                        className="w-full m-0 border-2 border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary-light outline-none"
-                                        placeholder="Enter name of medicine..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        style={{ fontSize: '1.5rem', padding: '1.5rem 1.5rem 1.5rem 5rem', borderRadius: '1rem', backgroundColor: 'transparent', transition: 'all 0.2s' }}
-                                    />
-                                </div>
-                                <button type="submit" className="btn btn-primary shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all" style={{ padding: '1rem 3rem', borderRadius: '0.75rem', fontSize: '1.25rem' }} disabled={loading || !searchTerm.trim()}>
-                                    {loading ? <div className="spinner border-white mini"></div> : <span className="font-bold">Search</span>}
-                                </button>
-                            </form>
-                        </div>
-                    )}
+                {/* Header Section */}
+                <div className="text-center space-y-4 mb-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Identify Your Medicine</h1>
+                    <p className="text-xl text-slate-500 font-medium max-w-xl mx-auto opacity-80">Choose your preferred search method to get detailed information instantly.</p>
                 </div>
 
-                {/* Compartment 2: Search by QR */}
-                <div
-                    className={`border-2 rounded-3xl transition-all overflow-hidden ${activeTab === 'scan' ? 'border-primary shadow-xl bg-white' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:shadow-md cursor-pointer'}`}
-                    onClick={() => { if (activeTab !== 'scan') { setActiveTab('scan'); setResult(null); setError(''); speakText("Switched to Search by QR"); } }}
-                >
-                    <div className="p-6 md:p-8 flex items-center justify-between">
-                        <h2 className={`m-0 text-2xl md:text-3xl ${activeTab === 'scan' ? 'font-black text-slate-900' : 'font-bold text-slate-500'}`}>Search by QR</h2>
-                        {activeTab !== 'scan' && <div className="text-slate-400 font-bold text-xl">+</div>}
-                        {activeTab === 'scan' && <div className="text-primary font-bold text-xl">-</div>}
-                    </div>
+                {/* Hide Search Inputs if Result is Found to reduce clutter for seniors */}
+                {!result && (
+                    <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100">
+                        {/* Tab Navigation */}
+                        <div className="flex gap-4 mb-8">
+                            <TabButton id="search" icon={Search} label="Type Name" />
+                            <TabButton id="scan" icon={ScanLine} label="Barcode" />
+                            <TabButton id="upload" icon={Camera} label="Take Photo" />
+                        </div>
 
-                    {activeTab === 'scan' && (
-                        <div className="px-6 md:px-8 pb-8 pt-2 animate-slide-up border-t border-slate-100">
-                            <div className="flex flex-col items-start w-full mt-4">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    capture="environment"
-                                    ref={fileInputRef}
-                                    onChange={handleImageUpload}
-                                    style={{ display: 'none' }}
-                                />
-
-                                <div className="w-full mb-10 flex flex-col items-start">
-                                    <button
-                                        type="button"
-                                        className="btn btn-primary shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
-                                        style={{ padding: '1.25rem 3rem', fontSize: '1.5rem', borderRadius: '1rem' }}
-                                        onClick={() => fileInputRef.current?.click()}
-                                        disabled={loading}
-                                    >
-                                        {loading ? (
-                                            <><div className="spinner border-white mini"></div> Scanning Label...</>
-                                        ) : (
-                                            <><span className="font-bold">Scan QR Code</span></>
-                                        )}
+                        {/* Search Input Area */}
+                        <div className="animate-slide-up">
+                            {/* TEXT SEARCH TAB */}
+                            {activeTab === 'search' && (
+                                <form onSubmit={handleSearch} className="flex flex-col gap-6">
+                                    <div className="relative flex items-center">
+                                        <Search className="absolute left-6 text-primary" size={32} />
+                                        <input
+                                            type="text"
+                                            className="w-full pl-20 pr-6 py-6 text-2xl font-bold bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/20 outline-none transition-all placeholder:font-normal placeholder:text-slate-400"
+                                            placeholder="e.g. Paracetamol"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                    <button type="submit" disabled={loading || !searchTerm.trim()} className="w-full bg-primary hover:bg-primary-dark text-white text-2xl font-bold py-6 rounded-2xl shadow-lg transition-all disabled:opacity-50 flex justify-center items-center">
+                                        {loading ? <RefreshCw className="animate-spin mr-3" size={32} /> : null}
+                                        {loading ? 'Searching...' : 'Search Medicine'}
                                     </button>
-                                </div>
+                                </form>
+                            )}
 
-                                <div className="w-full border-t border-slate-200 pt-8 flex flex-col items-start">
-                                    <p className="text-secondary mb-4 font-semibold text-sm uppercase tracking-widest text-slate-400">Or type the barcode number</p>
+                            {/* BARCODE SEARCH TAB */}
+                            {activeTab === 'scan' && (
+                                <div className="flex flex-col gap-8">
+                                    <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleImageUpload} className="hidden" />
 
-                                    <form onSubmit={handleScanBarcode} className="w-full flex flex-col items-start">
-                                        <div className="relative w-full mb-6 flex items-center">
-                                            <ScanLine className="absolute left-6 text-slate-800" size={32} />
-                                            <input
-                                                type="text"
-                                                className="w-full m-0 border-2 border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary-light outline-none"
-                                                placeholder="Enter the 12-digit number..."
-                                                value={barcode}
-                                                onChange={(e) => setBarcode(e.target.value)}
-                                                style={{ fontSize: '1.5rem', padding: '1.5rem 1.5rem 1.5rem 5rem', borderRadius: '1rem', backgroundColor: 'transparent', transition: 'all 0.2s' }}
-                                            />
-                                        </div>
-                                        <button type="submit" className="btn btn-primary shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all" style={{ padding: '1rem 3rem', borderRadius: '0.75rem', fontSize: '1.25rem' }} disabled={loading || !barcode.trim()}>
-                                            {loading ? <div className="spinner border-white mini"></div> : <span className="font-bold">Search</span>}
+                                    <button onClick={() => fileInputRef.current?.click()} disabled={loading} className="w-full bg-slate-900 hover:bg-slate-800 text-white text-2xl font-bold py-8 rounded-2xl shadow-lg transition-all disabled:opacity-50 flex flex-col justify-center items-center gap-4">
+                                        {loading ? <RefreshCw className="animate-spin" size={48} /> : <ScanLine size={48} className="text-primary" />}
+                                        {loading ? 'Scanning...' : 'Open Camera to Scan'}
+                                    </button>
+
+                                    <div className="relative flex items-center justify-center">
+                                        <div className="border-t border-slate-200 w-full absolute"></div>
+                                        <span className="bg-white px-4 text-slate-400 font-bold uppercase tracking-wider relative">OR ENTER NUMBER</span>
+                                    </div>
+
+                                    <form onSubmit={handleSearch} className="flex flex-col gap-4">
+                                        <input
+                                            type="number"
+                                            className="w-full px-6 py-5 text-2xl text-center font-bold tracking-widest bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/20 outline-none transition-all"
+                                            placeholder="123456789012"
+                                            value={barcode}
+                                            onChange={(e) => setBarcode(e.target.value)}
+                                        />
+                                        <button type="submit" disabled={loading || !barcode.trim()} onClick={handleScanBarcode} className="w-full bg-primary hover:bg-primary-dark text-white text-xl font-bold py-4 rounded-2xl shadow-md transition-all disabled:opacity-50">
+                                            Search by Number
                                         </button>
                                     </form>
                                 </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                            )}
 
-                {/* Compartment 3: Search by Photo */}
-                <div
-                    className={`border-2 rounded-3xl transition-all overflow-hidden ${activeTab === 'upload' ? 'border-primary shadow-xl bg-white' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:shadow-md cursor-pointer'}`}
-                    onClick={() => { if (activeTab !== 'upload') { setActiveTab('upload'); setResult(null); setError(''); speakText("Switched to Search by Photo"); } }}
-                >
-                    <div className="p-6 md:p-8 flex items-center justify-between">
-                        <h2 className={`m-0 text-2xl md:text-3xl ${activeTab === 'upload' ? 'font-black text-slate-900' : 'font-bold text-slate-500'}`}>Search by Photo</h2>
-                        {activeTab !== 'upload' && <div className="text-slate-400 font-bold text-xl">+</div>}
-                        {activeTab === 'upload' && <div className="text-primary font-bold text-xl">-</div>}
+                            {/* PHOTO SEARCH TAB */}
+                            {activeTab === 'upload' && (
+                                <div className="flex flex-col gap-6 text-center">
+                                    <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleImageUpload} className="hidden" />
+
+                                    <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-3xl p-10 flex flex-col items-center justify-center gap-4">
+                                        <Camera size={64} className="text-blue-400" />
+                                        <p className="text-xl text-blue-900 font-medium">Take a clear photo of the medicine box or the pill itself.</p>
+                                    </div>
+
+                                    <button onClick={() => fileInputRef.current?.click()} disabled={loading} className="w-full bg-primary hover:bg-primary-dark text-white text-2xl font-bold py-6 rounded-2xl shadow-lg transition-all disabled:opacity-50 flex justify-center items-center gap-3">
+                                        {loading ? <RefreshCw className="animate-spin" size={32} /> : <Camera size={32} />}
+                                        {loading ? 'Analyzing Photo...' : 'Take Photo Now'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
+                )}
 
-                    {activeTab === 'upload' && (
-                        <div className="px-6 md:px-8 pb-8 pt-2 animate-slide-up border-t border-slate-100">
-                            <div className="w-full flex flex-col items-start mt-4">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    capture="environment"
-                                    ref={fileInputRef}
-                                    onChange={handleImageUpload}
-                                    style={{ display: 'none' }}
-                                />
-                                <button
-                                    type="button"
-                                    className="btn btn-outline text-slate-800 border-2 border-slate-300 hover:border-primary hover:text-primary hover:bg-primary-light transition-all font-bold group"
-                                    style={{ padding: '1.5rem 3rem', borderRadius: '1rem', fontSize: '1.5rem' }}
-                                    onClick={() => fileInputRef.current?.click()}
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <span className="flex items-center justify-center gap-3"><div className="spinner border-slate-800 group-hover:border-primary mini"></div> Processing Photo...</span>
-                                    ) : (
-                                        <span className="flex items-center justify-center gap-3"><Camera size={32} className="group-hover:text-primary transition-colors" /> Upload a Photo</span>
+                {/* Error Banner */}
+                {error && !result && (
+                    <div className="animate-fade-in bg-red-100 border-l-8 border-red-500 rounded-r-2xl p-6 flex items-center gap-4 shadow-sm">
+                        <AlertCircle size={40} className="text-red-600 flex-shrink-0" />
+                        <p className="text-2xl font-bold text-red-900 m-0">{error}</p>
+                    </div>
+                )}
+
+                {/* Results Section */}
+                {result && (
+                    <div className="animate-slide-up flex flex-col gap-6">
+                        <button onClick={handleReset} className="self-start flex items-center gap-2 text-primary font-bold text-lg hover:bg-primary/10 px-4 py-2 rounded-xl transition-colors">
+                            <ArrowLeft size={24} /> Back to Search
+                        </button>
+
+                        <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-100">
+                            {/* Result Header */}
+                            <div className="bg-slate-50/50 p-8 md:p-12 border-b border-slate-100">
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="badge badge-primary px-3 py-1 font-bold">Identified Medicine</span>
+                                        </div>
+                                        <h2 className="text-5xl md:text-6xl font-black text-slate-900 m-0 tracking-tight leading-none">{result.medicine_name}</h2>
+                                        {result.composition && <p className="text-2xl text-slate-500 mt-4 font-semibold opacity-70 italic">{result.composition}</p>}
+                                    </div>
+                                    <button
+                                        onClick={() => speakText(`${result.medicine_name}. Usage: ${result.usage}. Dosage: ${result.dosage}.`)}
+                                        className="btn btn-primary btn-lg rounded-full px-8 py-5 flex items-center gap-3 shadow-primary group transition-all"
+                                        style={{ fontSize: '1.25rem' }}
+                                    >
+                                        <Volume2 size={28} className="group-hover:scale-110 transition-transform" />
+                                        <span>Read Aloud</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Result Content */}
+                            <div className="p-6 md:p-8 flex flex-col gap-6">
+                                {/* Info Block */}
+                                <div className="bg-blue-50 rounded-2xl p-6 border border-blue-100 shadow-sm">
+                                    <div className="flex items-center gap-3 text-blue-700 mb-3">
+                                        <Info size={32} />
+                                        <h3 className="text-2xl font-bold uppercase tracking-wide m-0">What is it for?</h3>
+                                    </div>
+                                    <p className="text-2xl text-slate-800 font-medium leading-snug">{result.usage || "Information not available."}</p>
+                                </div>
+
+                                {/* Usage Block */}
+                                <div className="bg-green-50 rounded-2xl p-6 border border-green-100 shadow-sm">
+                                    <div className="flex items-center gap-3 text-green-700 mb-3">
+                                        <CheckCircle size={32} />
+                                        <h3 className="text-2xl font-bold uppercase tracking-wide m-0">How to take</h3>
+                                    </div>
+                                    <p className="text-2xl text-slate-800 font-bold mb-2">{result.dosage || "Consult your doctor."}</p>
+                                    {result.usage_instructions && (
+                                        <p className="text-xl text-green-900 bg-green-200/50 p-4 rounded-xl font-medium mt-4 border border-green-200">
+                                            {result.usage_instructions}
+                                        </p>
                                     )}
-                                </button>
-                                <p className="mt-8 text-slate-500 font-medium text-lg border-l-4 border-slate-300 pl-4 py-1">
-                                    Capture the front of the medicine box or the pill itself. Make sure the text is clearly visible.
-                                </p>
+                                </div>
+
+                                {/* Warnings Block */}
+                                <div className="bg-amber-50 rounded-2xl p-6 border border-amber-200 shadow-sm">
+                                    <div className="flex items-center gap-3 text-amber-700 mb-4">
+                                        <AlertTriangle size={32} />
+                                        <h3 className="text-2xl font-bold uppercase tracking-wide m-0">Important Warnings</h3>
+                                    </div>
+                                    <div className="space-y-4 text-xl">
+                                        {result.precautions && (
+                                            <div className="bg-white p-4 rounded-xl border border-amber-100">
+                                                <strong className="text-amber-900 block mb-1">⚠️ Precautions:</strong>
+                                                <span className="text-slate-700">{result.precautions}</span>
+                                            </div>
+                                        )}
+                                        {result.side_effects && (
+                                            <div className="bg-white p-4 rounded-xl border border-amber-100">
+                                                <strong className="text-amber-900 block mb-1">🤒 Side Effects:</strong>
+                                                <span className="text-slate-700">{result.side_effects}</span>
+                                            </div>
+                                        )}
+                                        {result.missed_dose_guidelines && (
+                                            <div className="bg-white p-4 rounded-xl border border-amber-100">
+                                                <strong className="text-amber-900 block mb-1">⏰ If you miss a dose:</strong>
+                                                <span className="text-slate-700">{result.missed_dose_guidelines}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    )}
-                </div>
-
-                {error && (
-                    <div className="mt-4 p-5 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 flex items-start gap-4 w-full shadow-sm">
-                        <AlertCircle size={32} className="flex-shrink-0 mt-1" />
-                        <p className="font-bold text-xl m-0 leading-snug">{error}</p>
                     </div>
                 )}
             </div>
-
-            {result && (
-                <div className="card shadow-2xl animate-slide-up bg-white rounded-2xl border-0 overflow-hidden" style={{ maxWidth: '850px', margin: '0 auto', borderTop: '6px solid var(--primary-color)' }}>
-                    <div className="flex justify-between items-center mb-6 pb-4 bg-slate-50 p-6 -mx-6 -mt-6">
-                        <h2 className="m-0 text-3xl font-extrabold text-slate-800">{result.medicine_name}</h2>
-                        <button className="btn btn-ghost p-2 rounded-full hover:bg-slate-100" onClick={() => speakText(`Information for ${result.medicine_name}. Usage: ${result.usage}.`)}>
-                            🔊 Listen
-                        </button>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="info-block bg-blue-50 p-4 rounded-xl border border-blue-100">
-                            <h4 className="flex items-center gap-2 text-blue-800 font-bold uppercase mb-2">
-                                <Info size={18} /> What is it for?
-                            </h4>
-                            <p className="text-slate-800 text-lg">{result.usage || "Information not available."}</p>
-                        </div>
-
-                        <div className="info-block bg-green-50 p-4 rounded-xl border border-green-100">
-                            <h4 className="flex items-center gap-2 text-green-800 font-bold uppercase mb-2">
-                                <CheckCircle size={18} /> How to take
-                            </h4>
-                            <p className="text-slate-800 text-lg">{result.dosage || "Consult your prescription."}</p>
-                            {result.usage_instructions && (
-                                <p className="text-slate-700 mt-2 font-medium">👉 {result.usage_instructions}</p>
-                            )}
-                        </div>
-
-                        <div className="info-block bg-amber-50 p-4 rounded-xl border border-amber-100 md:col-span-2">
-                            <h4 className="flex items-center gap-2 text-amber-800 font-bold uppercase mb-2">
-                                <AlertTriangle size={18} /> Important Notes
-                            </h4>
-                            {result.precautions && <p className="mb-2"><strong>Precautions:</strong> {result.precautions}</p>}
-                            {result.side_effects && <p className="mb-2"><strong>Side Effects:</strong> {result.side_effects}</p>}
-                            {result.missed_dose_guidelines && <p><strong>If you miss a dose:</strong> {result.missed_dose_guidelines}</p>}
-                        </div>
-
-                        {result.composition && (
-                            <div className="info-block p-4 rounded-xl border border-slate-200 md:col-span-2">
-                                <h4 className="font-bold uppercase text-slate-500 mb-1">Composition (Ingredients)</h4>
-                                <p>{result.composition}</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )
-            }
-        </div >
+        </div>
     );
 };
 

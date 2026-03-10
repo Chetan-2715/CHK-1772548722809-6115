@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../App';
 import { prescriptionAPI } from '../services/api';
-import { FileText, Calendar, MapPin, Search, ChevronDown, ChevronUp, Clock, Pill } from 'lucide-react';
+import { FileText, Calendar, MapPin, Search, ChevronDown, ChevronUp, Clock, Pill, Camera } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
@@ -61,20 +61,20 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="container py-8 animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="container py-10 animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
                 <div>
-                    <h1>{t('dashboard.title')}</h1>
-                    <p className="text-secondary text-lg">{t('dashboard.welcome', { name: user?.name || 'User' })}</p>
+                    <h1 className="mb-2">{t('dashboard.title')}</h1>
+                    <p className="text-secondary text-lg font-medium opacity-80">{t('dashboard.welcome', { name: user?.name || 'User' })}</p>
                 </div>
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
-                    <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 w-full md:w-auto">
-                        <label className="text-secondary font-medium whitespace-nowrap text-sm">Active Domain:</label>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
+                    <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3 flex-1 lg:flex-none">
+                        <label className="text-secondary font-semibold whitespace-nowrap text-sm uppercase tracking-wider">Active Domain:</label>
                         <select
                             value={currentDomain}
                             onChange={handleDomainChange}
-                            className="bg-transparent border-none outline-none font-bold text-primary cursor-pointer w-full md:w-auto"
-                            style={{ fontSize: '1rem', minWidth: '130px' }}
+                            className="bg-transparent border-none outline-none font-bold text-primary cursor-pointer flex-1"
+                            style={{ fontSize: '1rem', minWidth: '140px' }}
                         >
                             <option value="ayurvedic">Ayurvedic</option>
                             <option value="homeopathy">Homeopathy</option>
@@ -86,20 +86,23 @@ const Dashboard = () => {
                             <option value="other">Other Speciality</option>
                         </select>
                     </div>
-                    <Link to="/upload" className="btn btn-primary w-full md:w-auto whitespace-nowrap" onMouseEnter={() => speakText("Scan a new prescription")}>
+                    <Link to="/upload" className="btn btn-primary px-8 py-3.5 shadow-primary" onMouseEnter={() => speakText("Scan a new prescription")}>
+                        <Camera className="mr-2" size={20} />
                         {t('dashboard.scan_new')}
                     </Link>
                 </div>
             </div>
 
             {loading ? (
-                <div className="flex justify-center p-8"><div className="spinner border-blue-500"></div></div>
+                <div className="flex justify-center p-20 animate-pulse"><div className="spinner border-blue-500"></div></div>
             ) : prescriptions.length === 0 ? (
-                <div className="card text-center p-12 bg-slate-50 border-dashed border-2 border-slate-300">
-                    <FileText size={48} className="mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-slate-500">{t('dashboard.no_prescriptions')}</h3>
-                    <p className="text-secondary mb-6">{t('dashboard.scan_first')}</p>
-                    <Link to="/upload" className="btn btn-primary">{t('dashboard.start_scanning')}</Link>
+                <div className="card text-center py-20 px-8 bg-slate-50/50 border-dashed border-2 border-slate-200 shadow-none hover:shadow-none hover:translate-y-0">
+                    <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mx-auto mb-6 border border-slate-100">
+                        <FileText size={40} className="text-slate-300" />
+                    </div>
+                    <h2 className="text-slate-700 mb-3">{t('dashboard.no_prescriptions')}</h2>
+                    <p className="text-secondary mb-8 text-lg max-w-md mx-auto">{t('dashboard.scan_first')}</p>
+                    <Link to="/upload" className="btn btn-primary btn-lg">{t('dashboard.start_scanning')}</Link>
                 </div>
             ) : (
                 <div className="flex flex-col gap-6">

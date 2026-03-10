@@ -81,23 +81,26 @@ const Login = () => {
     }
 
     return (
-        <div className="login-container flex justify-center items-center" style={{ minHeight: '70vh' }}>
-            <div className="card card-glass w-full animate-slide-up" style={{ maxWidth: '500px' }}>
-                <div className="text-center mb-6">
-                    <img
-                        src="/image.png"
-                        alt="Scan4Elders Logo"
-                        style={{ width: '72px', height: 'auto', margin: '0 auto', marginBottom: '1rem', display: 'block', objectFit: 'contain' }}
-                    />
-                    <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-                    <p className="text-secondary">
-                        {isLogin ? 'Enter your details to access your account' : 'Join Scan4Elders for a safer medication journey'}
+        <div className="login-container flex justify-center items-center py-12 px-4" style={{ minHeight: '90vh' }}>
+            <div className="card card-glass w-full animate-slide-up shadow-xl" style={{ maxWidth: '480px', padding: '3rem' }}>
+                <div className="text-center mb-10">
+                    <div className="bg-white w-20 h-20 rounded-3xl shadow-sm flex items-center justify-center mx-auto mb-6 border border-slate-100">
+                        <img
+                            src="/image.png"
+                            alt="Scan4Elders Logo"
+                            style={{ width: '48px', height: 'auto', objectFit: 'contain' }}
+                        />
+                    </div>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight m-0">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+                    <p className="text-secondary mt-3 font-medium opacity-70">
+                        {isLogin ? 'Enter your credentials to continue' : 'Sign up for intelligent medication management'}
                     </p>
                 </div>
 
                 {error && (
-                    <div className="card mb-4" style={{ backgroundColor: 'var(--error-light)', color: 'var(--error-color)', padding: '1rem', border: '1px solid var(--error-color)' }}>
-                        <strong>Error:</strong> {error}
+                    <div className="badge badge-error w-full py-4 mb-6 rounded-xl flex items-center justify-center gap-2 border border-red-200">
+                        <AlertTriangle size={18} />
+                        <span className="font-bold">{error}</span>
                     </div>
                 )}
 
