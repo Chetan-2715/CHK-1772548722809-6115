@@ -11,7 +11,7 @@ const resources = {
             scan: { badge: "Advanced Identification", hero_title_1: "Medicine", hero_title_2: "Intelligence.", hero_sub: "Identify any medicine instantly using AI. Choose your method below.", col_name: "Search by Name", col_barcode: "Search by Barcode", col_photo: "Search by Photo", name_placeholder: "e.g. Paracetamol", find_medicine: "Find Medicine", choose_file: "Choose File / Take Image", or_manually: "or manually", barcode_placeholder: "890123... (Barcode)", search_barcode: "Search Barcode", upload_photo: "Upload Photo", visual_ai: "Visual AI Identification", capture: "Capture Medicine", searching_name: "Searching by name...", scanning_barcode: "Scanning barcode...", identifying: "Identifying medicine...", uploaded_image: "Uploaded Image", analyzing_photo: "Analyzing Photo...", click_change: "Click to change image", click_change_photo: "Click to change photo", not_found: "Could not find that", new_search: "New Search", ai_verified: "AI Verification Successful", primary_use: "Primary Use", standard_dose: "Standard Dose", safety: "Safety & Warnings", side_effects: "Side Effects", missed_dose: "Missed Dose", read_aloud: "Read Aloud" },
             upload: { title: "Read Prescription", subtitle: "Upload a clear photo of your doctor's prescription, and we will extract and explain all the medicines simply.", upload_image: "Upload Image", click_choose: "Click to choose image", formats: "JPEG, PNG formats supported", clear: "Clear Image", analyze: "Analyze Prescription", analyzing: "Analyzing Image...", results: "Results", results_placeholder: "Your results will appear here after analysis.", doctor: "Doctor", hospital: "Hospital", found: "Found", medicines: "medicines", play_audio: "Play Audio Summary", prescribed: "Prescribed", set_reminder: "Set Reminder", cancel_reminder: "Cancel Reminder", time_to_take: "Time to Take", frequency: "Frequency", daily: "Every Day", twice_daily: "Twice a Day", weekly: "Once a Week", save_reminder: "Save Reminder", side_effects: "Side Effects" },
             history: { title: "Interaction History", subtitle: "A log of all medicines you have checked.", no_history: "No history yet", searched: "Searched manually", scanned: "Scanned Barcode/Image", verified: "Verified Check", from_prescription: "Extracted from Prescription", viewed: "Viewed" },
-            profile: { title: "My Profile", medical_history: "Medical History", caretaker: "Caretaker", weekly_reports: "Weekly Reports", appointments: "Appointment Scheduler", logout: "Logout" },
+            profile: { title: "My Profile", medical_history: "Medical History", caretaker: "Caretaker", weekly_reports: "Weekly Reports", appointments: "Appointment Scheduler", logout: "Logout", general_settings: "General Settings", primary_language: "Primary Language", language_desc: "This language will be used across the entire app, including AI responses.", appearance: "Appearance", appearance_desc: "Choose your preferred display mode.", light_mode: "Light Mode", dark_mode: "Dark Mode", selected: "Selected" },
             login: { welcome_back: "Welcome Back", create_account: "Create Account", subtitle_login: "Enter your credentials to continue", subtitle_register: "Sign up for intelligent medication management", full_name: "Full Name", email: "Email Address", password: "Password", age: "Age (Optional)", phone: "Phone (Optional)", agree_privacy: "I agree to the", privacy_link: "Privacy Policy and Terms of Service", btn_login: "Login", btn_register: "Create Account", no_account: "Don't have an account?", have_account: "Already have an account?", sign_up: "Sign Up", log_in: "Log In" },
             lang_popup: { title: "Choose Your Language", subtitle: "अपनी भाषा चुनें | आपली भाषा निवडा", footer: "You can change this anytime in Settings", confirm: "Continue" },
             a11y: { options: "Accessibility Options", size: "Size", theme: "Theme", voice: "Voice", language: "Language" }
@@ -25,7 +25,7 @@ const resources = {
             scan: { badge: "उन्नत पहचान", hero_title_1: "दवा", hero_title_2: "पहचान।", hero_sub: "AI का उपयोग करके किसी भी दवा की तुरंत पहचान करें।", col_name: "नाम से खोजें", col_barcode: "बारकोड से खोजें", col_photo: "फोटो से खोजें", name_placeholder: "जैसे पैरासिटामोल", find_medicine: "दवा खोजें", choose_file: "फ़ाइल चुनें / फोटो लें", or_manually: "या मैन्युअल रूप से", barcode_placeholder: "890123... (बारकोड)", search_barcode: "बारकोड खोजें", upload_photo: "फोटो अपलोड करें", visual_ai: "विज़ुअल AI पहचान", capture: "दवा कैप्चर करें", searching_name: "नाम से खोज रहे हैं...", scanning_barcode: "बारकोड स्कैन हो रहा है...", identifying: "दवा की पहचान हो रही है...", uploaded_image: "अपलोड की गई छवि", analyzing_photo: "फोटो का विश्लेषण...", click_change: "बदलने के लिए क्लिक करें", click_change_photo: "फोटो बदलने के लिए क्लिक करें", not_found: "यह नहीं मिला", new_search: "नई खोज", ai_verified: "AI सत्यापन सफल", primary_use: "प्राथमिक उपयोग", standard_dose: "मानक खुराक", safety: "सुरक्षा और चेतावनी", side_effects: "दुष्प्रभाव", missed_dose: "छूटी हुई खुराक", read_aloud: "पढ़कर सुनाएं" },
             upload: { title: "पर्चा पढ़ें", subtitle: "अपने डॉक्टर के पर्चे की स्पष्ट फोटो अपलोड करें, हम सभी दवाओं को सरलता से समझाएंगे।", upload_image: "छवि अपलोड करें", click_choose: "छवि चुनने के लिए क्लिक करें", formats: "JPEG, PNG प्रारूप समर्थित", clear: "छवि हटाएं", analyze: "पर्चा विश्लेषण करें", analyzing: "छवि का विश्लेषण...", results: "परिणाम", results_placeholder: "विश्लेषण के बाद परिणाम यहाँ दिखाई देंगे।", doctor: "डॉक्टर", hospital: "अस्पताल", found: "मिली", medicines: "दवाएं", play_audio: "ऑडियो सारांश चलाएं", prescribed: "निर्धारित", set_reminder: "रिमाइंडर सेट करें", cancel_reminder: "रिमाइंडर रद्द करें", time_to_take: "लेने का समय", frequency: "आवृत्ति", daily: "हर दिन", twice_daily: "दिन में दो बार", weekly: "सप्ताह में एक बार", save_reminder: "रिमाइंडर सहेजें", side_effects: "दुष्प्रभाव" },
             history: { title: "इतिहास", subtitle: "आपने जो दवाएं जांची हैं उनका रिकॉर्ड।", no_history: "अभी तक कोई इतिहास नहीं", searched: "मैन्युअल खोज", scanned: "बारकोड/छवि स्कैन", verified: "सत्यापन जांच", from_prescription: "पर्चे से निकाला", viewed: "देखा गया" },
-            profile: { title: "मेरी प्रोफ़ाइल", medical_history: "चिकित्सा इतिहास", caretaker: "देखभालकर्ता", weekly_reports: "साप्ताहिक रिपोर्ट", appointments: "अपॉइंटमेंट शेड्यूलर", logout: "लॉगआउट" },
+            profile: { title: "मेरी प्रोफ़ाइल", medical_history: "चिकित्सा इतिहास", caretaker: "देखभालकर्ता", weekly_reports: "साप्ताहिक रिपोर्ट", appointments: "अपॉइंटमेंट शेड्यूलर", logout: "लॉगआउट", general_settings: "सामान्य सेटिंग्स", primary_language: "प्राथमिक भाषा", language_desc: "यह भाषा पूरे ऐप में उपयोग की जाएगी, AI प्रतिक्रियाओं सहित।", appearance: "दिखावट", appearance_desc: "अपना पसंदीदा डिस्प्ले मोड चुनें।", light_mode: "लाइट मोड", dark_mode: "डार्क मोड", selected: "चयनित" },
             login: { welcome_back: "वापसी पर स्वागत है", create_account: "खाता बनाएं", subtitle_login: "जारी रखने के लिए अपनी जानकारी दर्ज करें", subtitle_register: "बुद्धिमान दवा प्रबंधन के लिए साइन अप करें", full_name: "पूरा नाम", email: "ईमेल पता", password: "पासवर्ड", age: "आयु (वैकल्पिक)", phone: "फ़ोन (वैकल्पिक)", agree_privacy: "मैं सहमत हूँ", privacy_link: "गोपनीयता नीति और सेवा की शर्तें", btn_login: "लॉगिन", btn_register: "खाता बनाएं", no_account: "खाता नहीं है?", have_account: "पहले से खाता है?", sign_up: "साइन अप", log_in: "लॉग इन" },
             lang_popup: { title: "अपनी भाषा चुनें", subtitle: "Choose your language | आपली भाषा निवडा", footer: "आप इसे कभी भी सेटिंग्स में बदल सकते हैं", confirm: "जारी रखें" },
             a11y: { options: "एक्सेसिबिलिटी विकल्प", size: "आकार", theme: "थीम", voice: "आवाज़", language: "भाषा" }
@@ -39,7 +39,7 @@ const resources = {
             scan: { badge: "प्रगत ओळख", hero_title_1: "औषध", hero_title_2: "ओळख.", hero_sub: "AI वापरून कोणत्याही औषधाची ओळख करा.", col_name: "नावाने शोधा", col_barcode: "बारकोडने शोधा", col_photo: "फोटोने शोधा", name_placeholder: "उदा. पॅरासिटामॉल", find_medicine: "औषध शोधा", choose_file: "फाइल निवडा / फोटो घ्या", or_manually: "किंवा मॅन्युअली", barcode_placeholder: "890123... (बारकोड)", search_barcode: "बारकोड शोधा", upload_photo: "फोटो अपलोड करा", visual_ai: "व्हिज्युअल AI ओळख", capture: "औषध कॅप्चर करा", searching_name: "नावाने शोधत आहे...", scanning_barcode: "बारकोड स्कॅन होत आहे...", identifying: "औषध ओळखत आहे...", uploaded_image: "अपलोड केलेली प्रतिमा", analyzing_photo: "फोटोचे विश्लेषण...", click_change: "बदलण्यासाठी क्लिक करा", click_change_photo: "फोटो बदलण्यासाठी क्लिक करा", not_found: "सापडले नाही", new_search: "नवीन शोध", ai_verified: "AI सत्यापन यशस्वी", primary_use: "प्राथमिक वापर", standard_dose: "मानक डोस", safety: "सुरक्षा आणि इशारे", side_effects: "दुष्परिणाम", missed_dose: "चुकलेला डोस", read_aloud: "वाचून दाखवा" },
             upload: { title: "प्रिस्क्रिप्शन वाचा", subtitle: "तुमच्या डॉक्टरांच्या प्रिस्क्रिप्शनचा स्पष्ट फोटो अपलोड करा, आम्ही सर्व औषधे सोप्या भाषेत समजावून सांगू.", upload_image: "प्रतिमा अपलोड करा", click_choose: "प्रतिमा निवडण्यासाठी क्लिक करा", formats: "JPEG, PNG प्रारूप समर्थित", clear: "प्रतिमा हटवा", analyze: "प्रिस्क्रिप्शन विश्लेषण करा", analyzing: "प्रतिमेचे विश्लेषण...", results: "निकाल", results_placeholder: "विश्लेषणानंतर निकाल येथे दिसतील.", doctor: "डॉक्टर", hospital: "रुग्णालय", found: "सापडली", medicines: "औषधे", play_audio: "ऑडिओ सारांश ऐका", prescribed: "निर्धारित", set_reminder: "रिमाइंडर सेट करा", cancel_reminder: "रिमाइंडर रद्द करा", time_to_take: "घेण्याची वेळ", frequency: "वारंवारता", daily: "दररोज", twice_daily: "दिवसातून दोनदा", weekly: "आठवड्यातून एकदा", save_reminder: "रिमाइंडर जतन करा", side_effects: "दुष्परिणाम" },
             history: { title: "इतिहास", subtitle: "तुम्ही तपासलेल्या औषधांचा रेकॉर्ड.", no_history: "अद्याप कोणताही इतिहास नाही", searched: "मॅन्युअल शोध", scanned: "बारकोड/प्रतिमा स्कॅन", verified: "सत्यापन तपासणी", from_prescription: "प्रिस्क्रिप्शनमधून", viewed: "पाहिले" },
-            profile: { title: "माझे प्रोफाईल", medical_history: "वैद्यकीय इतिहास", caretaker: "काळजीवाहक", weekly_reports: "साप्ताहिक अहवाल", appointments: "अपॉइंटमेंट शेड्यूलर", logout: "लॉगआउट" },
+            profile: { title: "माझे प्रोफाईल", medical_history: "वैद्यकीय इतिहास", caretaker: "काळजीवाहक", weekly_reports: "साप्ताहिक अहवाल", appointments: "अपॉइंटमेंट शेड्यूलर", logout: "लॉगआउट", general_settings: "सामान्य सेटिंग्ज", primary_language: "प्राथमिक भाषा", language_desc: "ही भाषा संपूर्ण अॅपमध्ये वापरली जाईल, AI प्रतिसादांसह.", appearance: "दिसावा", appearance_desc: "तुमचा पसंतीचा डिस्प्ले मोड निवडा.", light_mode: "लाइट मोड", dark_mode: "डार्क मोड", selected: "निवडले" },
             login: { welcome_back: "पुन्हा स्वागत", create_account: "खाते तयार करा", subtitle_login: "पुढे जाण्यासाठी तुमची माहिती प्रविष्ट करा", subtitle_register: "बुद्धिमान औषध व्यवस्थापनासाठी साइन अप करा", full_name: "पूर्ण नाव", email: "ईमेल पत्ता", password: "पासवर्ड", age: "वय (पर्यायी)", phone: "फोन (पर्यायी)", agree_privacy: "मी सहमत आहे", privacy_link: "गोपनीयता धोरण आणि सेवा अटी", btn_login: "लॉगिन", btn_register: "खाते तयार करा", no_account: "खाते नाही?", have_account: "आधीच खाते आहे?", sign_up: "साइन अप", log_in: "लॉग इन" },
             lang_popup: { title: "तुमची भाषा निवडा", subtitle: "Choose your language | अपनी भाषा चुनें", footer: "तुम्ही हे कधीही सेटिंग्जमध्ये बदलू शकता", confirm: "पुढे जा" },
             a11y: { options: "अॅक्सेसिबिलिटी पर्याय", size: "आकार", theme: "थीम", voice: "आवाज", language: "भाषा" }
@@ -112,6 +112,13 @@ const extraTranslations = {
                 none_reported: 'None reported',
                 standard_safety: 'Standard safety rules',
                 take_as_remembered: 'Take as remembered',
+                buy_medicine: 'Buy This Medicine',
+                jan_aushadhi_desc: 'Get affordable generic medicines from Pradhan Mantri Jan Aushadhi Kendra.',
+                buy_on_jan_aushadhi: 'Buy on Jan Aushadhi Store',
+                nearby_stores: 'Nearby Medical Stores & Hospitals',
+                find_nearby: 'Find Nearby',
+                finding_nearby: 'Finding nearby places...',
+                get_directions: 'Directions',
                 errors: {
                     medicine_not_found: 'Medicine not found. Please check the spelling.',
                     generic: 'An error occurred',
@@ -153,6 +160,16 @@ const extraTranslations = {
                     upload_error: 'An error occurred during upload',
                     reminder_failed: 'Failed to set reminder'
                 }
+            },
+            chatbot: {
+                title: 'Health Buddy',
+                online: 'Online',
+                welcome: 'Hi! I\'m your Health Buddy. How can I help you today?',
+                quick_medicines: 'What are my medicines?',
+                quick_reminders: 'When is my next dose?',
+                quick_feeling: 'I\'m not feeling well.',
+                quick_side_effect: 'Any side effects?',
+                placeholder: 'Type your message here...'
             }
         }
     },
@@ -220,6 +237,13 @@ const extraTranslations = {
                 none_reported: 'कोई रिपोर्ट नहीं',
                 standard_safety: 'मानक सुरक्षा नियम',
                 take_as_remembered: 'याद आते ही लें',
+                buy_medicine: 'यह दवा खरीदें',
+                jan_aushadhi_desc: 'प्रधानमंत्री जन औषधि केंद्र से सस्ती जेनेरिक दवाएं प्राप्त करें।',
+                buy_on_jan_aushadhi: 'जन औषधि स्टोर पर खरीदें',
+                nearby_stores: 'पास के मेडिकल स्टोर और अस्पताल',
+                find_nearby: 'पास में खोजें',
+                finding_nearby: 'पास के स्थान खोज रहे हैं...',
+                get_directions: 'दिशा-निर्देश',
                 errors: {
                     medicine_not_found: 'दवा नहीं मिली। कृपया वर्तनी जांचें।',
                     generic: 'एक त्रुटि हुई',
@@ -261,6 +285,16 @@ const extraTranslations = {
                     upload_error: 'अपलोड के दौरान त्रुटि हुई',
                     reminder_failed: 'रिमाइंडर सेट नहीं हो सका'
                 }
+            },
+            chatbot: {
+                title: 'हेल्थ बडी',
+                online: 'ऑनलाइन',
+                welcome: 'नमस्ते! मैं आपका हेल्थ बडी हूँ। आज मैं आपकी कैसे मदद कर सकता हूँ?',
+                quick_medicines: 'मेरी दवाएं क्या हैं?',
+                quick_reminders: 'मेरी अगली खुराक कब है?',
+                quick_feeling: 'मुझे अच्छा महसूस नहीं हो रहा है।',
+                quick_side_effect: 'क्या इसके कोई दुष्प्रभाव हैं?',
+                placeholder: 'अपना संदेश यहाँ लिखें...'
             }
         }
     },
@@ -328,6 +362,13 @@ const extraTranslations = {
                 none_reported: 'काही नोंद नाही',
                 standard_safety: 'मानक सुरक्षा नियम',
                 take_as_remembered: 'आठवल्यावर घ्या',
+                buy_medicine: 'हे औषध खरेदी करा',
+                jan_aushadhi_desc: 'प्रधानमंत्री जन औषधी केंद्रातून परवडणारी जेनेरिक औषधे मिळवा.',
+                buy_on_jan_aushadhi: 'जन औषधी स्टोअरवर खरेदी करा',
+                nearby_stores: 'जवळचे मेडिकल स्टोअर्स आणि रुग्णालये',
+                find_nearby: 'जवळचे शोधा',
+                finding_nearby: 'जवळचे ठिकाणे शोधत आहे...',
+                get_directions: 'दिशा',
                 errors: {
                     medicine_not_found: 'औषध सापडले नाही. कृपया स्पेलिंग तपासा.',
                     generic: 'एक त्रुटी आली',
@@ -369,6 +410,16 @@ const extraTranslations = {
                     upload_error: 'अपलोड दरम्यान त्रुटी आली',
                     reminder_failed: 'रिमाइंडर सेट करता आला नाही'
                 }
+            },
+            chatbot: {
+                title: 'हेल्थ बडी',
+                online: 'ऑनलाइन',
+                welcome: 'नमस्कार! मी तुमचा हेल्थ बडी आहे. आज मी तुमची कशी मदत करू शकतो?',
+                quick_medicines: 'माझी औषधे कोणती आहेत?',
+                quick_reminders: 'माझा पुढचा डोस कधी आहे?',
+                quick_feeling: 'मला बरं वाटत नाहीये.',
+                quick_side_effect: 'काही दुष्परिणाम आहेत का?',
+                placeholder: 'तुमचा संदेश येथे लिहा...'
             }
         }
     }

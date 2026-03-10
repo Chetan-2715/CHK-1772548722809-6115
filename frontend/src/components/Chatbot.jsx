@@ -1,148 +1,259 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { MessageCircle, X, Send, Bot, User, ImagePlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { AppContext } from '../App';
-import { Send, MessageCircle, X } from 'lucide-react';
+import { chatbotAPI } from '../services/api';
 import './Chatbot.css';
 
 const Chatbot = () => {
-    const { speakText, user } = useContext(AppContext);
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState([
-        {
-            type: 'bot',
-            text: 'Hello! I\'m your medication assistant. I can help you with information about your prescriptions, medications, and health records. How can I help you today?'
-        }
-    ]);
-    const [inputValue, setInputValue] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    const [showDot, setShowDot] = useState(true);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const messagesEndRef = useRef(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+    const inputRef = useRef(null);
+    const imageInputRef = useRef(null);
+    const { t } = useTranslation();
+    const { user, speakText } = useContext(AppContext);
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, isTyping]);
 
-    const handleSendMessage = async () => {
-        if (!inputValue.trim()) return;
+    useEffect(() => {
+        if (isOpen) {
+            setTimeout(() => inputRef.current?.focus(), 300);
+            setShowDot(false);
+        }
+    }, [isOpen]);
 
-        // Add user message
-        setMessages(prev => [...prev, {
-            type: 'user',
-            text: inputValue
-        }]);
-        setInputValue('');
-        setLoading(true);
+    useEffect(() => {
+        if (isOpen && messages.length === 0) {
+            const name = user?.name?.split(' ')[0] || '';
+            setMessages([{
+                role: 'assistant',
+                content: t('chatbot.welcome', { name }) ||
+                    `Hello ${name}! 😊 I'm your health assistant. Ask me anything about your medications or just chat! 💙`
+            }]);
+        }
+    }, [isOpen]);
+
+    const handleImageSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onload = (ev) => setImagePreview(ev.target.result);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const clearImage = () => {
+        setImageFile(null);
+        setImagePreview(null);
+        if (imageInputRef.current) imageInputRef.current.value = '';
+    };
+
+    const handleSend = async () => {
+        const text = input.trim();
+        if ((!text && !imageFile) || isTyping) return;
+
+        // Build user message display
+        const userMsg = {
+            role: 'user',
+            content: text || (imageFile ? '📷 [Image sent]' : ''),
+            image: imagePreview || null
+        };
+        const newMessages = [...messages, userMsg];
+        setMessages(newMessages);
+        setInput('');
+        setIsTyping(true);
 
         try {
-            // Simulate API call to backend chatbot
-            // In production, this would call: POST /api/chatbot/query
-            const response = await fetch('http://localhost:8000/api/chatbot/query', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    message: inputValue,
-                    user_id: user?.id
-                })
-            });
+            let reply;
 
-            if (!response.ok) {
-                throw new Error('Failed to get response');
+            if (imageFile) {
+                // Image + text chat
+                const formData = new FormData();
+                formData.append('file', imageFile);
+                formData.append('message', text || 'What is this?');
+                const historyForApi = newMessages.slice(-8).map(m => ({
+                    role: m.role === 'assistant' ? 'assistant' : 'user',
+                    content: m.content
+                }));
+                formData.append('history', JSON.stringify(historyForApi));
+
+                const res = await chatbotAPI.chatImage(formData);
+                reply = res.data.reply;
+                clearImage();
+            } else {
+                // Text-only chat
+                const history = newMessages.slice(-10).map(m => ({
+                    role: m.role === 'assistant' ? 'assistant' : 'user',
+                    content: m.content
+                }));
+                const res = await chatbotAPI.chat({ message: text, history });
+                reply = res.data.reply;
             }
 
-            const data = await response.json();
+            reply = reply || t('chatbot.error_reply') || "I'm sorry, could you try again?";
+            setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+        } catch (err) {
             setMessages(prev => [...prev, {
-                type: 'bot',
-                text: data.response || 'I couldn\'t process that request. Please try again.'
+                role: 'assistant',
+                content: t('chatbot.error_reply') || "I'm having trouble connecting. Please try again. 🙏"
             }]);
-
-            speakText(data.response || 'I couldn\'t process that request.');
-        } catch (error) {
-            console.log('Chatbot API not yet available - using placeholder response');
-            const placeholderResponses = [
-                'Based on your prescription history, I recommend taking your medication as directed by your doctor.',
-                'Your last prescription included common medications for managing your health condition.',
-                'Remember to take your medications at the scheduled times for best results.',
-                'I can help you understand your medical history and prescriptions. What specific medication do you want to know about?'
-            ];
-            const response = placeholderResponses[Math.floor(Math.random() * placeholderResponses.length)];
-            setMessages(prev => [...prev, {
-                type: 'bot',
-                text: response
-            }]);
-            speakText(response);
+            clearImage();
         } finally {
-            setLoading(false);
+            setIsTyping(false);
         }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
+
+    const quickActions = [
+        t('chatbot.quick_medicines') || 'My medicines',
+        t('chatbot.quick_reminders') || 'My reminders',
+        t('chatbot.quick_feeling') || 'Feeling unwell',
+        t('chatbot.quick_side_effect') || 'Side effects?',
+    ];
+
+    const sendQuickAction = (text) => {
+        if (isTyping) return;
+        const userMsg = { role: 'user', content: text };
+        const newMessages = [...messages, userMsg];
+        setMessages(newMessages);
+        setIsTyping(true);
+
+        const history = newMessages.slice(-10).map(m => ({
+            role: m.role === 'assistant' ? 'assistant' : 'user',
+            content: m.content
+        }));
+
+        chatbotAPI.chat({ message: text, history })
+            .then(res => {
+                const reply = res.data.reply || "I'm sorry, could you try again?";
+                setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+            })
+            .catch(() => {
+                setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: "I'm having trouble connecting. Please try again. 🙏"
+                }]);
+            })
+            .finally(() => setIsTyping(false));
     };
 
     return (
         <>
-            {/* Floating Button */}
             <button
-                className="chatbot-float-btn"
-                onClick={() => setIsOpen(true)}
-                onMouseEnter={() => speakText('Open medication assistant chatbot')}
-                title="Medication Assistant"
+                className={`chatbot-fab ${isOpen ? 'open' : ''}`}
+                onClick={() => setIsOpen(!isOpen)}
+                title={t('chatbot.title') || 'Health Assistant'}
             >
-                <MessageCircle size={24} />
+                {isOpen ? <X size={26} /> : <MessageCircle size={26} />}
+                {showDot && !isOpen && <span className="chatbot-fab-dot" />}
             </button>
 
-            {/* Chat Window */}
             {isOpen && (
                 <div className="chatbot-window">
                     <div className="chatbot-header">
-                        <div className="chatbot-header-content">
-                            <MessageCircle size={24} />
-                            <h3>Medication Assistant</h3>
+                        <div className="chatbot-header-avatar">
+                            <Bot size={22} />
                         </div>
-                        <button
-                            className="chatbot-close-btn"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            <X size={24} />
+                        <div className="chatbot-header-info">
+                            <h4>{t('chatbot.title') || 'Health Assistant'}</h4>
+                            <span><span className="online-dot"></span>{t('chatbot.online') || 'Online • Ready to help'}</span>
+                        </div>
+                        <button className="chatbot-close-btn" onClick={() => setIsOpen(false)}>
+                            <X size={18} />
                         </button>
                     </div>
 
                     <div className="chatbot-messages">
-                        {messages.map((msg, idx) => (
-                            <div key={idx} className={`message message-${msg.type}`}>
-                                <div className="message-bubble">
-                                    {msg.text}
+                        {messages.map((msg, i) => (
+                            <div key={i} className={`chat-msg ${msg.role === 'user' ? 'user' : 'bot'}`}>
+                                <div className="chat-msg-avatar">
+                                    {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
+                                </div>
+                                <div className="chat-bubble">
+                                    {msg.image && (
+                                        <img src={msg.image} alt="Shared" className="chat-image" />
+                                    )}
+                                    {msg.content}
                                 </div>
                             </div>
                         ))}
-                        {loading && (
-                            <div className="message message-bot">
-                                <div className="message-bubble loading">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
+                        {isTyping && (
+                            <div className="chat-msg bot">
+                                <div className="chat-msg-avatar"><Bot size={14} /></div>
+                                <div className="typing-indicator">
+                                    <div className="typing-dot"></div>
+                                    <div className="typing-dot"></div>
+                                    <div className="typing-dot"></div>
                                 </div>
                             </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="chatbot-input">
+                    {messages.length <= 2 && !isTyping && (
+                        <div className="chatbot-quick-actions">
+                            {quickActions.map((action, i) => (
+                                <button key={i} className="quick-action-btn" onClick={() => sendQuickAction(action)}>
+                                    {action}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Image Preview */}
+                    {imagePreview && (
+                        <div className="chatbot-image-preview">
+                            <img src={imagePreview} alt="To send" />
+                            <button className="chatbot-image-remove" onClick={clearImage}>✕</button>
+                        </div>
+                    )}
+
+                    <div className="chatbot-input-area">
                         <input
-                            type="text"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                            placeholder="Ask about your medications..."
-                            disabled={loading}
+                            type="file"
+                            ref={imageInputRef}
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={handleImageSelect}
                         />
                         <button
-                            onClick={handleSendMessage}
-                            disabled={loading || !inputValue.trim()}
-                            className="send-btn"
+                            className="chatbot-attach-btn"
+                            onClick={() => imageInputRef.current?.click()}
+                            title="Attach image"
+                            type="button"
                         >
-                            <Send size={20} />
+                            <ImagePlus size={20} />
+                        </button>
+                        <input
+                            ref={inputRef}
+                            className="chatbot-input"
+                            placeholder={t('chatbot.placeholder') || 'Ask me anything...'}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={isTyping}
+                        />
+                        <button
+                            className="chatbot-send-btn"
+                            onClick={handleSend}
+                            disabled={(!input.trim() && !imageFile) || isTyping}
+                        >
+                            <Send size={18} />
                         </button>
                     </div>
                 </div>

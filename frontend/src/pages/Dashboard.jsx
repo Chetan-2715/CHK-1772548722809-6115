@@ -4,6 +4,7 @@ import { AppContext } from '../App';
 import { prescriptionAPI } from '../services/api';
 import { FileText, Calendar, MapPin, Search, ChevronDown, ChevronUp, Clock, Pill, Camera } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import Chatbot from '../components/Chatbot';
 
 const Dashboard = () => {
     const { user, speakText } = useContext(AppContext);
@@ -61,6 +62,7 @@ const Dashboard = () => {
     };
 
     return (
+        <>
         <div className="container py-10 animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
                 <div>
@@ -184,6 +186,8 @@ const Dashboard = () => {
                 </div>
             )}
         </div>
+        <Chatbot />
+        </>
     );
 };
 

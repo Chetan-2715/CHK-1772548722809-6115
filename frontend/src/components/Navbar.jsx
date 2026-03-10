@@ -47,8 +47,8 @@ const Navbar = () => {
                         src="/favicon.jpeg"
                         alt="Scan4Elders Logo"
                         style={{
-                            width: '36px',
-                            height: '36px',
+                            width: '50px',
+                            height: '50px',
                             borderRadius: '8px',
                             objectFit: 'cover',
                             boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',

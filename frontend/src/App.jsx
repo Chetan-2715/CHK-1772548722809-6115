@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import i18n from './i18n';
 import Navbar from './components/Navbar';
-import AccessibilityControls from './components/AccessibilityControls';
+
 import Home from './pages/Home';
 import Login from './pages/Login';
 import UploadPrescription from './pages/UploadPrescription';
@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Privacy from './pages/Privacy';
 import SelectConcern from './pages/SelectConcern';
 import Dashboard from './pages/Dashboard';
+
 
 // Context for user state and accessibility
 export const AppContext = React.createContext();
@@ -131,7 +132,6 @@ function App() {
             <BrowserRouter>
                 <div className="app-container">
                     <Navbar />
-                    <AccessibilityControls />
                     <main className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
                         <Routes>
                             <Route path="/" element={user ? <Dashboard /> : <Home />} />
@@ -144,6 +144,7 @@ function App() {
                             <Route path="/select-concern" element={user ? <SelectConcern /> : <Navigate to="/login" />} />
                         </Routes>
                     </main>
+
                 </div>
             </BrowserRouter>
         </AppContext.Provider>

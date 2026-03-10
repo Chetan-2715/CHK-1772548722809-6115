@@ -56,4 +56,11 @@ export const remindersAPI = {
     delete: (id) => api.delete(`/reminders/${id}`),
 };
 
+export const chatbotAPI = {
+    chat: (data) => api.post('/chatbot/chat', data),
+    chatImage: (formData) => api.post('/chatbot/chat-image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+};
+
 export default api;

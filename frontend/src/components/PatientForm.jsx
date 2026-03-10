@@ -23,6 +23,7 @@ const PatientForm = ({ onComplete }) => {
         city: '',
         state: '',
         nationality: '',
+        aayushmanBharatCardNumber: '',
         bloodPressure: '',
         sugarLevel: '',
         bloodGroup: '',
@@ -241,6 +242,13 @@ const PatientForm = ({ onComplete }) => {
                     <div className="input-group m-0">
                         <label className="label">Nationality:</label>
                         <input type="text" name="nationality" className="input" value={formData.nationality} onChange={handleTextChange} />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="input-group m-0">
+                        <label className="label">Aayushman Bharat Card Number:</label>
+                        <input type="text" name="aayushmanBharatCardNumber" className="input" placeholder="e.g. AB-1234-5678-9012" value={formData.aayushmanBharatCardNumber} onChange={handleTextChange} />
                     </div>
                 </div>
 
