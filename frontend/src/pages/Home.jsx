@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../App';
-import { FileText, Camera, ScanLine, Clock, ArrowRight, ShieldCheck, HeartPulse } from 'lucide-react';
+import { FileText, Camera, ScanLine, Clock, ArrowRight, HeartPulse, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import './Home.css';
 
@@ -55,9 +55,9 @@ const Home = () => {
 
             {/* Features Grid */}
             <section className="features-section">
-                <h2 className="section-title text-center">{t('home.how_it_helps')}</h2>
+                <h2 className="section-title text-center" style={{ fontWeight: 900 }}>{t('home.how_it_helps')}</h2>
 
-                <div className="grid-3 mt-8">
+                <div className="features-grid mt-12">
                     <FeatureCard
                         to="/upload"
                         icon={<FileText size={40} className="feature-icon" />}
@@ -69,13 +69,15 @@ const Home = () => {
                     <FeatureCard
                         to="/scan"
                         icon={<ScanLine size={40} className="feature-icon" />}
-                        title={t('home.verify')}
-                        description={t('home.verify_desc')}
+                        title={t('app.scan_medicine')}
+                        description={t('home.identify_desc')}
                         color="secondary"
                     />
 
+
+
                     <FeatureCard
-                        to="/reminders"
+                        to="/"
                         icon={<Clock size={40} className="feature-icon" />}
                         title={t('home.reminders')}
                         description={t('home.reminders_desc')}

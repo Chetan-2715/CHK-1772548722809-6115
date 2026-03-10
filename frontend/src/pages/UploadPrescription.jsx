@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Upload, Camera, FileText, CheckCircle, AlertTriangle, PlayCircle, Clock } from 'lucide-react';
 import { AppContext } from '../App';
 import { prescriptionAPI, remindersAPI } from '../services/api';
-import VerifyTablet from './VerifyTablet';
+
 import './UploadPrescription.css';
 
 const UploadPrescription = () => {
@@ -64,15 +64,15 @@ const UploadPrescription = () => {
 
     return (
         <div className="upload-container animate-fade-in">
-            <div className="text-center mb-8">
-                <h1>Read Presentation</h1>
-                <p className="subtitle text-secondary">
+            <div className="text-center mb-12">
+                <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Read Prescription</h1>
+                <p className="subtitle text-secondary mt-4 font-medium opacity-80">
                     Upload a clear photo of your doctor's prescription, and we will extract and explain all the medicines simply.
                 </p>
             </div>
 
-            <div className="upload-layout grid-2">
-                <div className="card upload-card card-glass">
+            <div className="upload-layout">
+                <div className="card upload-card card-glass shadow-xl" style={{ borderTop: '4px solid var(--primary-color)' }}>
                     <h3><Camera className="inline-icon" /> Upload Image</h3>
 
                     <div className={`dropzone ${preview ? 'has-image' : ''}`}>
@@ -161,7 +161,7 @@ const UploadPrescription = () => {
                                 </button>
                             </div>
 
-                            <div className="medicines-list grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                            <div className="medicines-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginTop: '1.5rem' }}>
                                 {result.medicines.map((med, index) => (
                                     <div key={index} className="medicine-card card shadow-sm border border-slate-200">
                                         <div className="med-header flex justify-between items-center bg-slate-50 p-4 border-b border-slate-200 rounded-t-xl">
@@ -177,14 +177,14 @@ const UploadPrescription = () => {
                                         <div className="med-details p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {med.usage && (
                                                 <div className="detail-item">
-                                                    <span className="label block text-slate-500 text-sm font-semibold uppercase mb-1 drop-shadow-sm">Usage</span>
-                                                    <span className="value block font-medium text-slate-800">{med.usage}</span>
+                                                    <span className="label" style={{ display: 'block', color: '#64748b', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.04em' }}>Usage</span>
+                                                    <span className="value" style={{ display: 'block', fontWeight: 600, color: '#1e293b', fontSize: '0.95rem', lineHeight: 1.5 }}>{med.usage}</span>
                                                 </div>
                                             )}
                                             {med.dosage && (
                                                 <div className="detail-item">
-                                                    <span className="label block text-slate-500 text-sm font-semibold uppercase mb-1 drop-shadow-sm">Dosage</span>
-                                                    <span className="value block font-medium text-slate-800">{med.dosage}</span>
+                                                    <span className="label" style={{ display: 'block', color: '#64748b', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.3rem', letterSpacing: '0.04em' }}>Dosage</span>
+                                                    <span className="value" style={{ display: 'block', fontWeight: 600, color: '#1e293b', fontSize: '0.95rem', lineHeight: 1.5 }}>{med.dosage}</span>
                                                 </div>
                                             )}
 
@@ -197,7 +197,7 @@ const UploadPrescription = () => {
 
                                             {med.side_effects && (
                                                 <div className="detail-item col-span-1 md:col-span-2 mt-2 bg-red-50 p-3 rounded-md border border-red-100">
-                                                    <span className="label block text-red-700 text-sm font-bold uppercase mb-1 flex items-center gap-1"><AlertTriangle size={14} /> Side Effects</span>
+                                                    <span className="label text-red-700 text-sm font-bold uppercase mb-1 flex items-center gap-1"><AlertTriangle size={14} /> Side Effects</span>
                                                     <span className="value block text-red-900">{med.side_effects}</span>
                                                 </div>
                                             )}
@@ -251,11 +251,7 @@ const UploadPrescription = () => {
                 </div>
             </div>
 
-            {result && !loading && (
-                <div className="mt-12 animate-slide-up w-full max-w-4xl mx-auto border-t border-slate-200 pt-8 mt-12">
-                    <VerifyTablet />
-                </div>
-            )}
+
         </div>
     );
 };

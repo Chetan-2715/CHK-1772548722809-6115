@@ -2,26 +2,156 @@
     max-width: 900px;
     margin: 0 auto;
     padding: 2rem;
+    animation: fadeInUp 0.6s ease-out forwards;
 }
 
 .table-wrapper {
     overflow-x: auto;
     box-shadow: 0 4px 6px -1px var(--border-color);
+    border-radius: var(--radius-lg);
 }
 
 .table-wrapper table {
     border-collapse: collapse;
+    width: 100%;
 }
 
-.table-wrapper th,
+.table-wrapper th {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+}
+
 .table-wrapper td {
-    border-color: var(--border-color);
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+}
+
+.table-wrapper tbody tr:hover {
+    background-color: var(--primary-light);
+    transform: translateX(2px);
+}
+
+.table-wrapper tbody tr:hover td {
+    color: var(--primary-color);
 }
 
 .patient-form-container .card {
     background-color: var(--background-secondary);
+    animation: slideUp 0.5s ease-out forwards;
+}
+
+.patient-form-container label.cursor-pointer {
+    transition: all var(--transition-fast);
+    font-weight: 500;
 }
 
 .patient-form-container label.cursor-pointer:hover {
     color: var(--primary-color);
+    transform: translateX(2px);
+}
+
+/* Form Controls Enhancement */
+.patient-form-container input,
+.patient-form-container select,
+.patient-form-container textarea {
+    transition: all var(--transition-fast);
+}
+
+.patient-form-container input:focus,
+.patient-form-container select:focus,
+.patient-form-container textarea:focus {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* Error State */
+.input-error {
+    border-color: var(--error-color) !important;
+    background-color: rgba(239, 68, 68, 0.05) !important;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Success State */
+.input-success {
+    border-color: var(--success-color) !important;
+}
+
+.input-success:focus {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .patient-form-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .table-wrapper {
+        font-size: 0.9rem;
+    }
+
+    .table-wrapper th,
+    .table-wrapper td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .patient-form-container {
+        padding: 1rem;
+    }
+
+    .table-wrapper {
+        font-size: 0.85rem;
+    }
+
+    .table-wrapper th,
+    .table-wrapper td {
+        padding: 0.625rem 0.375rem;
+    }
+
+    .table-wrapper tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+    }
+
+    .table-wrapper thead {
+        display: none;
+    }
+
+    .table-wrapper td {
+        display: block;
+        padding: 0.5rem;
+        text-align: right;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-wrapper td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: var(--primary-color);
+        float: left;
+    }
+}
+
+/* Animation for form field */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

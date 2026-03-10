@@ -1,7 +1,8 @@
 """
 Authentication routes for user registration and login.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 import bcrypt
@@ -41,7 +42,7 @@ class UserUpdate(BaseModel):
     accessibility_voice: bool | None = None
     medical_profile: dict | None = None
     caretaker_name: str | None = None
-    caretaker_email: EmailStr | str | None = None
+    caretaker_email: str | None = None
     caretaker_phone: str | None = None
     caretaker_relation: str | None = None
 
@@ -51,6 +52,8 @@ class Token(BaseModel):
     token_type: str
     user: dict
 
+
+security = HTTPBearer()
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -153,12 +156,10 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
 @router.put("/profile")
 async def update_profile(
     user_update: UserUpdate,
-    token: str = None,
+    auth: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
-    if not token:
-        raise HTTPException(status_code=401, detail="Authentication required")
-
+    token = auth.credentials
     user_id = get_current_user_id(token)
     user = db.query(User).filter(User.id == user_id).first()
 
@@ -208,12 +209,10 @@ async def update_profile(
 
 @router.get("/profile")
 async def get_profile(
-    token: str = None,
+    auth: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
-    if not token:
-        raise HTTPException(status_code=401, detail="Authentication required")
-
+    token = auth.credentials
     user_id = get_current_user_id(token)
     user = db.query(User).filter(User.id == user_id).first()
 

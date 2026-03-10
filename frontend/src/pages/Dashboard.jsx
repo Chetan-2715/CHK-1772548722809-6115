@@ -61,7 +61,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="container py-10 animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <div className="container py-10 animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
                 <div>
                     <h1 className="mb-2">{t('dashboard.title')}</h1>
@@ -139,7 +139,7 @@ const Dashboard = () => {
                                 </div>
 
                                 {isExpanded && (
-                                    <div className="p-6 pt-0 border-t border-slate-100 bg-slate-50 animate-slide-up">
+                                    <div className="p-6 pt-2 border-t border-slate-100 bg-slate-50 animate-slide-up">
                                         {loadingDetails && !data ? (
                                             <div className="p-4 text-center"><div className="spinner mini mx-auto"></div></div>
                                         ) : data ? (
@@ -157,15 +157,15 @@ const Dashboard = () => {
                                                             </div>
 
                                                             {med.detailed_info && (
-                                                                <div className="space-y-2 text-sm mt-3 border-t border-slate-100 pt-3">
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.75rem', borderTop: '1px solid #e2e8f0', paddingTop: '0.75rem' }}>
                                                                     {med.detailed_info.usage_instructions && (
-                                                                        <p><strong><Clock size={14} className="inline mr-1" />{t('dashboard.instructions')}:</strong> {med.detailed_info.usage_instructions}</p>
+                                                                        <p style={{ margin: '0 0 0.35rem 0', fontSize: '0.9rem', lineHeight: '1.6' }}><strong><Clock size={14} className="inline mr-1" />{t('dashboard.instructions')}:</strong> {med.detailed_info.usage_instructions}</p>
                                                                     )}
                                                                     {med.detailed_info.usage && (
-                                                                        <p><strong>{t('dashboard.usage')}:</strong> {med.detailed_info.usage}</p>
+                                                                        <p style={{ margin: '0 0 0.35rem 0', fontSize: '0.9rem', lineHeight: '1.6' }}><strong>{t('dashboard.usage')}:</strong> {med.detailed_info.usage}</p>
                                                                     )}
                                                                     {med.detailed_info.precautions && (
-                                                                        <p className="text-amber-600"><strong>{t('dashboard.precautions')}:</strong> {med.detailed_info.precautions}</p>
+                                                                        <p style={{ margin: '0 0 0.35rem 0', fontSize: '0.9rem', lineHeight: '1.6', color: '#d97706' }}><strong>{t('dashboard.precautions')}:</strong> {med.detailed_info.precautions}</p>
                                                                     )}
                                                                 </div>
                                                             )}

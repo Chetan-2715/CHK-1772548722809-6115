@@ -28,13 +28,13 @@ const Profile = () => {
     ];
 
     return (
-        <div className="container py-8 animate-fade-in">
+        <div className="container" style={{ padding: '2rem 1.5rem' }}>
             <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">My Profile</h1>
 
             <div className="flex flex-col md:flex-row gap-12">
                 {/* Sidebar */}
                 <div className="w-full md:w-1/4">
-                    <div className="flex flex-col gap-6 md:sticky md:top-24 pl-2 font-body">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingLeft: '0.5rem' }}>
                         {tabs.map(tab => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -42,7 +42,8 @@ const Profile = () => {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-4 w-full text-left py-1 transition-all group focus:outline-none`}
+                                    className="flex items-center gap-4 w-full text-left transition-all group focus:outline-none"
+                                    style={{ padding: '0.5rem 0.25rem' }}
                                 >
                                     <Icon size={32} color={isActive ? "var(--primary-color)" : "#1E293B"} strokeWidth={isActive ? 2.5 : 2} style={{ transition: 'color 0.2s' }} />
                                     <span style={{ color: isActive ? "var(--primary-color)" : "#1E293B", transition: 'color 0.2s' }} className={`text-[1.15rem] leading-none ${isActive ? 'font-bold' : 'font-bold'} hover:opacity-80`}>

@@ -92,7 +92,7 @@ const Login = () => {
                         />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 tracking-tight m-0">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-                    <p className="text-secondary mt-3 font-medium opacity-70">
+                    <p className="text-secondary" style={{ marginTop: '0.75rem', fontSize: '0.95rem', opacity: 0.7 }}>
                         {isLogin ? 'Enter your credentials to continue' : 'Sign up for intelligent medication management'}
                     </p>
                 </div>
@@ -104,7 +104,7 @@ const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="flex-col gap-4">
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                     {!isLogin && (
                         <div className="input-group">
                             <label className="label">Full Name</label>

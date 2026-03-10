@@ -17,7 +17,7 @@ const Navbar = () => {
     }
 
     const handleEmergencyCall = () => {
-        const phone = user?.medical_profile?.caretaker?.phone;
+        const phone = user?.caretaker_phone || user?.medical_profile?.caretaker?.phone;
         if (phone) {
             speakText('Calling caretaker');
             window.location.href = `tel:${phone}`;
@@ -43,7 +43,17 @@ const Navbar = () => {
                     className="navbar-brand"
                     onMouseEnter={() => speakText("Scan4Elders Home")}
                 >
-                    <Activity className="brand-icon pulse-animation" />
+                    <img
+                        src="/favicon.jpeg"
+                        alt="Scan4Elders Logo"
+                        style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '8px',
+                            objectFit: 'cover',
+                            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
+                        }}
+                    />
                     <span>{t('app.title')}</span>
                 </Link>
 

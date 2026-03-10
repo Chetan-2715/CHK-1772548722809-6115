@@ -41,10 +41,10 @@ const MedicineHistory = () => {
     };
 
     return (
-        <div className="container py-8 animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div className="container animate-fade-in" style={{ maxWidth: '800px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
             <div className="mb-8">
                 <h1>Interaction History</h1>
-                <p className="text-secondary text-lg">A log of all medicines you have checked.</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', marginTop: '0.25rem' }}>A log of all medicines you have checked.</p>
             </div>
 
             {loading ? (
@@ -63,8 +63,8 @@ const MedicineHistory = () => {
                                     {getActionIcon(item.action)}
                                 </div>
                                 <div>
-                                    <h3 className="m-0 text-lg font-bold text-slate-800">{item.medicine_name}</h3>
-                                    <span className="text-sm font-medium text-slate-500">{getActionText(item.action)}</span>
+                                    <h3 style={{ margin: '0 0 0.2rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>{item.medicine_name}</h3>
+                                    <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#64748b' }}>{getActionText(item.action)}</span>
                                 </div>
                             </div>
                             <div className="text-sm text-slate-400 font-mono bg-slate-50 px-3 py-1 rounded-md flex items-center gap-1">

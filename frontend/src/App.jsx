@@ -6,7 +6,6 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import UploadPrescription from './pages/UploadPrescription';
 import ScanMedicine from './pages/ScanMedicine';
-import VerifyTablet from './pages/VerifyTablet';
 import MedicineHistory from './pages/MedicineHistory';
 import Profile from './pages/Profile';
 import Privacy from './pages/Privacy';
@@ -125,7 +124,6 @@ function App() {
                             <Route path="/login" element={<Login />} />
                             <Route path="/upload" element={user ? <UploadPrescription /> : <Navigate to="/login" />} />
                             <Route path="/scan" element={user ? <ScanMedicine /> : <Navigate to="/login" />} />
-                            <Route path="/verify" element={user ? <VerifyTablet /> : <Navigate to="/login" />} />
                             <Route path="/history" element={user ? <MedicineHistory /> : <Navigate to="/login" />} />
                             <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
                             <Route path="/privacy" element={<Privacy />} />
