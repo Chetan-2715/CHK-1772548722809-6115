@@ -1,4 +1,4 @@
--- Medi-Scribe Database Schema
+-- Scan4Elders Database Schema
 -- PostgreSQL (Neon Cloud)
 
 CREATE TABLE IF NOT EXISTS users (

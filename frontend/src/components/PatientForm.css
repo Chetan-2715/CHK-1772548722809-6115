@@ -1,0 +1,27 @@
+.patient-form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    box-shadow: 0 4px 6px -1px var(--border-color);
+}
+
+.table-wrapper table {
+    border-collapse: collapse;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+    border-color: var(--border-color);
+}
+
+.patient-form-container .card {
+    background-color: var(--background-secondary);
+}
+
+.patient-form-container label.cursor-pointer:hover {
+    color: var(--primary-color);
+}

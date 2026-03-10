@@ -53,16 +53,16 @@ const ScanMedicine = () => {
         setLoading(true);
         setError('');
         setResult(null);
-        speakText(`Looking up barcode ${barcode}`);
+        speakText(`Looking up QR code ${barcode}`);
 
         try {
             const res = await medicineAPI.scanBarcode({ barcode });
             if (res.data.success) {
                 setResult(res.data.data);
-                speakText(`Found medicine for this barcode: ${res.data.data.medicine_name}`);
+                speakText(`Found medicine for this QR code: ${res.data.data.medicine_name}`);
             } else {
-                setError(res.data.message || 'Barcode not found in database');
-                speakText("Barcode not found in database");
+                setError(res.data.message || 'QR code not found in database');
+                speakText("QR code not found in database");
             }
         } catch (err) {
             const msg = err.response?.data?.detail || "An error occurred";
@@ -93,10 +93,10 @@ const ScanMedicine = () => {
             if (res.data.success !== false && res.data.lookup_result?.success) {
                 setResult(res.data.lookup_result.data);
                 setBarcode(res.data.barcode);
-                speakText(`Found barcode. Identified as ${res.data.lookup_result.data.medicine_name}`);
+                speakText(`Found QR code. Identified as ${res.data.lookup_result.data.medicine_name}`);
             } else {
                 // Fallback: Verify tablet visually
-                speakText("Could not find barcode, trying visual identification");
+                speakText("Could not find QR code, trying visual identification");
                 const verifyRes = await medicineAPI.verifyTabletImage(formData);
 
                 if (verifyRes.data.success) {
@@ -126,7 +126,7 @@ const ScanMedicine = () => {
             <div className="text-center mb-8">
                 <h1>Medicine Lookup</h1>
                 <p className="text-secondary" style={{ fontSize: '1.125rem' }}>
-                    Search by name, enter a barcode, or upload a photo to learn about any medicine.
+                    Search by name, enter a QR code, or upload a photo to learn about any medicine.
                 </p>
             </div>
 
@@ -140,9 +140,9 @@ const ScanMedicine = () => {
                     </button>
                     <button
                         className={`flex-1 py-4 text-center font-bold text-lg transition-colors border-none cursor-pointer ${activeTab === 'scan' ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'bg-transparent text-slate-500 hover:bg-slate-50'}`}
-                        onClick={() => { setActiveTab('scan'); setResult(null); setError(''); speakText("Switched to Manual Barcode"); }}
+                        onClick={() => { setActiveTab('scan'); setResult(null); setError(''); speakText("Switched to Manual QR Code"); }}
                     >
-                        <ScanLine className="inline-block mr-2 align-text-bottom" size={20} /> Barcode
+                        <ScanLine className="inline-block mr-2 align-text-bottom" size={20} /> QR Code
                     </button>
                     <button
                         className={`flex-1 py-4 text-center font-bold text-lg transition-colors border-none cursor-pointer ${activeTab === 'upload' ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'bg-transparent text-slate-500 hover:bg-slate-50'}`}
@@ -174,7 +174,7 @@ const ScanMedicine = () => {
                             <input
                                 type="text"
                                 className="input flex-1"
-                                placeholder="Enter numbers under barcode..."
+                                placeholder="Enter numbers under QR code..."
                                 value={barcode}
                                 onChange={(e) => setBarcode(e.target.value)}
                                 style={{ fontSize: '1.25rem', padding: '1rem' }}
@@ -208,7 +208,7 @@ const ScanMedicine = () => {
                                 )}
                             </button>
                             <p className="mt-4 text-secondary">
-                                Take a picture of the medicine box, barcode, or the tablet itself.
+                                Take a picture of the medicine box, QR code, or the tablet itself.
                             </p>
                         </div>
                     )}

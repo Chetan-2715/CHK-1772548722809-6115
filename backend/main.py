@@ -1,5 +1,5 @@
 """
-Medi-Scribe – AI Medication Assistant for Seniors
+Scan4Elders – AI Medication Assistant for Seniors
 FastAPI Backend Application
 """
 from fastapi import FastAPI
@@ -15,7 +15,7 @@ from routes.medicine import router as medicine_router
 from routes.reminder import router as reminder_router
 
 app = FastAPI(
-    title="Medi-Scribe API",
+    title="Scan4Elders API",
     description="AI Medication Assistant for Seniors - Backend API",
     version="1.0.0",
     docs_url="/docs",
@@ -51,7 +51,7 @@ async def startup():
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to Medi-Scribe API",
+        "message": "Welcome to Scan4Elders API",
         "version": "1.0.0",
         "docs": "/docs",
         "endpoints": {
@@ -65,7 +65,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "medi-scribe-api"}
+    return {"status": "healthy", "service": "scan4elders-api"}
 
 
 # Upload prescription endpoint (alias for convenience)

@@ -7,8 +7,11 @@ import Login from './pages/Login';
 import UploadPrescription from './pages/UploadPrescription';
 import ScanMedicine from './pages/ScanMedicine';
 import VerifyTablet from './pages/VerifyTablet';
-import Reminders from './pages/Reminders';
 import MedicineHistory from './pages/MedicineHistory';
+import Profile from './pages/Profile';
+import Privacy from './pages/Privacy';
+import SelectConcern from './pages/SelectConcern';
+import Dashboard from './pages/Dashboard';
 
 // Context for user state and accessibility
 export const AppContext = React.createContext();
@@ -112,13 +115,15 @@ function App() {
                     <AccessibilityControls />
                     <main className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
                         <Routes>
-                            <Route path="/" element={<Home />} />
+                            <Route path="/" element={user ? <Dashboard /> : <Home />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/upload" element={user ? <UploadPrescription /> : <Navigate to="/login" />} />
                             <Route path="/scan" element={user ? <ScanMedicine /> : <Navigate to="/login" />} />
                             <Route path="/verify" element={user ? <VerifyTablet /> : <Navigate to="/login" />} />
                             <Route path="/history" element={user ? <MedicineHistory /> : <Navigate to="/login" />} />
-                            <Route path="/reminders" element={user ? <Reminders /> : <Navigate to="/login" />} />
+                            <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+                            <Route path="/privacy" element={<Privacy />} />
+                            <Route path="/select-concern" element={user ? <SelectConcern /> : <Navigate to="/login" />} />
                         </Routes>
                     </main>
                 </div>

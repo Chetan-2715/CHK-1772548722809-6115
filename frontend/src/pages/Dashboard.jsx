@@ -1,0 +1,159 @@
+import React, { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { AppContext } from '../App';
+import { prescriptionAPI } from '../services/api';
+import { FileText, Calendar, MapPin, Search, ChevronDown, ChevronUp, Clock, Pill } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+const Dashboard = () => {
+    const { user, speakText } = useContext(AppContext);
+    const [prescriptions, setPrescriptions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [expandedIds, setExpandedIds] = useState([]);
+    const [detailedData, setDetailedData] = useState({});
+    const [loadingDetails, setLoadingDetails] = useState(false);
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        const fetchPrescriptions = async () => {
+            try {
+                const res = await prescriptionAPI.getAll();
+                setPrescriptions(res.data.prescriptions || []);
+                speakText(`You have ${res.data.prescriptions?.length || 0} prescriptions scanned.`);
+            } catch (err) {
+                console.error("Failed to load prescriptions:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPrescriptions();
+    }, [speakText]);
+
+    const toggleExpand = async (id) => {
+        if (expandedIds.includes(id)) {
+            setExpandedIds(prev => prev.filter(e => e !== id));
+            return;
+        }
+
+        setExpandedIds(prev => [...prev, id]);
+
+        if (!detailedData[id]) {
+            setLoadingDetails(true);
+            try {
+                speakText("Loading full prescription details.");
+                const res = await prescriptionAPI.getById(id);
+                setDetailedData(prev => ({ ...prev, [id]: res.data }));
+            } catch (err) {
+                console.error("Error fetching detail", err);
+            } finally {
+                setLoadingDetails(false);
+            }
+        }
+    };
+
+    return (
+        <div className="container py-8 animate-fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1>{t('dashboard.title')}</h1>
+                    <p className="text-secondary text-lg">{t('dashboard.welcome', { name: user?.name || 'User' })}</p>
+                </div>
+                <Link to="/upload" className="btn btn-primary" onMouseEnter={() => speakText("Scan a new prescription")}>
+                    {t('dashboard.scan_new')}
+                </Link>
+            </div>
+
+            {loading ? (
+                <div className="flex justify-center p-8"><div className="spinner border-blue-500"></div></div>
+            ) : prescriptions.length === 0 ? (
+                <div className="card text-center p-12 bg-slate-50 border-dashed border-2 border-slate-300">
+                    <FileText size={48} className="mx-auto text-slate-300 mb-4" />
+                    <h3 className="text-slate-500">{t('dashboard.no_prescriptions')}</h3>
+                    <p className="text-secondary mb-6">{t('dashboard.scan_first')}</p>
+                    <Link to="/upload" className="btn btn-primary">{t('dashboard.start_scanning')}</Link>
+                </div>
+            ) : (
+                <div className="flex flex-col gap-6">
+                    {prescriptions.map((p) => {
+                        const isExpanded = expandedIds.includes(p.id);
+                        const data = detailedData[p.id];
+
+                        return (
+                            <div key={p.id} className="card p-0 overflow-hidden bg-white shadow-md border border-slate-200 transition-all">
+                                <div
+                                    className="p-6 cursor-pointer flex justify-between items-center hover:bg-slate-50"
+                                    onClick={() => toggleExpand(p.id)}
+                                >
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="p-2 bg-primary-light text-primary rounded-lg">
+                                                <FileText size={20} />
+                                            </div>
+                                            <h3 className="m-0 text-xl font-bold">
+                                                {p.doctor_name || t('dashboard.unknown_doctor')}
+                                            </h3>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-4 text-sm text-secondary font-medium">
+                                            {p.hospital_name && (
+                                                <span className="flex items-center gap-1"><MapPin size={16} /> {p.hospital_name}</span>
+                                            )}
+                                            <span className="flex items-center gap-1"><Calendar size={16} /> {p.prescription_date ? new Date(p.prescription_date).toLocaleDateString() : (p.created_at ? new Date(p.created_at).toLocaleDateString() : t('dashboard.unknown_date'))}</span>
+                                            <span className="flex items-center gap-1"><Pill size={16} /> {t('dashboard.medicines_count', { count: p.medicines_count })}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-slate-400">
+                                        {isExpanded ? <ChevronUp size={28} /> : <ChevronDown size={28} />}
+                                    </div>
+                                </div>
+
+                                {isExpanded && (
+                                    <div className="p-6 pt-0 border-t border-slate-100 bg-slate-50 animate-slide-up">
+                                        {loadingDetails && !data ? (
+                                            <div className="p-4 text-center"><div className="spinner mini mx-auto"></div></div>
+                                        ) : data ? (
+                                            <div className="mt-6">
+                                                <h4 className="font-bold text-lg mb-4 text-slate-800 border-b pb-2">{t('dashboard.medicines_info')}</h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {data.medicines && data.medicines.map((med, idx) => (
+                                                        <div key={idx} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                                            <div className="flex justify-between items-start mb-2">
+                                                                <h5 className="font-bold text-primary text-lg m-0">{med.medicine_name}</h5>
+                                                                {med.duration && <span className="badge badge-primary">{med.duration}</span>}
+                                                            </div>
+                                                            <div className="mb-3 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg inline-block">
+                                                                <strong>{t('dashboard.dosage')}:</strong> {med.dosage} ({med.frequency})
+                                                            </div>
+
+                                                            {med.detailed_info && (
+                                                                <div className="space-y-2 text-sm mt-3 border-t border-slate-100 pt-3">
+                                                                    {med.detailed_info.usage_instructions && (
+                                                                        <p><strong><Clock size={14} className="inline mr-1" />{t('dashboard.instructions')}:</strong> {med.detailed_info.usage_instructions}</p>
+                                                                    )}
+                                                                    {med.detailed_info.usage && (
+                                                                        <p><strong>{t('dashboard.usage')}:</strong> {med.detailed_info.usage}</p>
+                                                                    )}
+                                                                    {med.detailed_info.precautions && (
+                                                                        <p className="text-amber-600"><strong>{t('dashboard.precautions')}:</strong> {med.detailed_info.precautions}</p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-secondary p-4">Could not load additional details.</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default Dashboard;

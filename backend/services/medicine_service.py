@@ -8,7 +8,7 @@ from models.prescription import Prescription, PrescriptionMedicine
 from services.gemini_service import get_medicine_info, identify_tablet_from_image, compare_compositions
 
 
-async def search_medicine(name: str, db: Session) -> dict:
+async def search_medicine(name: str, db: Session, domain: str = None) -> dict:
     """
     Search for a medicine by name.
     1. Check database first
@@ -30,7 +30,7 @@ async def search_medicine(name: str, db: Session) -> dict:
         }
 
     # Use Gemini API
-    gemini_result = await get_medicine_info(name)
+    gemini_result = await get_medicine_info(name, domain)
 
     if not gemini_result["success"]:
         return gemini_result
@@ -76,7 +76,8 @@ async def verify_tablet(
     db: Session,
     image_bytes: bytes = None,
     mime_type: str = "image/jpeg",
-    barcode: str = None
+    barcode: str = None,
+    domain: str = None
 ) -> dict:
     """
     Verify a tablet against user's prescriptions.
@@ -90,7 +91,7 @@ async def verify_tablet(
 
     # If image provided, identify the tablet first
     if image_bytes:
-        id_result = await identify_tablet_from_image(image_bytes, mime_type)
+        id_result = await identify_tablet_from_image(image_bytes, mime_type, domain)
         if id_result["success"]:
             identified_name = id_result["data"].get("identified_medicine", medicine_name)
 
@@ -134,7 +135,7 @@ async def verify_tablet(
 
     # Not found in prescription — check composition similarity
     # Get composition of the identified medicine
-    identified_medicine_info = await search_medicine(identified_name, db)
+    identified_medicine_info = await search_medicine(identified_name, db, domain)
     identified_composition = ""
     if identified_medicine_info["success"]:
         identified_composition = identified_medicine_info["data"].get("composition", "")

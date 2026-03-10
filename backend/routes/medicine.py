@@ -30,11 +30,12 @@ class MedicalTermRequest(BaseModel):
 @router.get("/{name}")
 async def get_medicine_by_name(
     name: str,
+    domain: str = Header(None),
     authorization: str = Header(None),
     db: Session = Depends(get_db)
 ):
     """Get medicine information by name."""
-    result = await search_medicine(name, db)
+    result = await search_medicine(name, db, domain)
 
     if not result["success"]:
         raise HTTPException(status_code=500, detail=result.get("error", "Failed to get medicine info"))
@@ -111,6 +112,7 @@ async def scan_barcode_image(
 async def verify_tablet_endpoint(
     request: VerifyTabletRequest = None,
     file: UploadFile = File(None),
+    domain: str = Header(None),
     authorization: str = Header(None),
     db: Session = Depends(get_db)
 ):
@@ -147,7 +149,8 @@ async def verify_tablet_endpoint(
         db=db,
         image_bytes=image_bytes,
         mime_type=mime_type,
-        barcode=barcode
+        barcode=barcode,
+        domain=domain
     )
 
     # Record in history

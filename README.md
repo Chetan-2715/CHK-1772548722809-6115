@@ -1,4 +1,4 @@
-# Medi-Scribe – AI Medication Assistant for Seniors
+# Scan4Elders – AI Medication Assistant for Seniors
 
 A full-stack project to help seniors scan prescriptions, identify medicines, verify tablets, and set reminders, powered by Gemini AI and a Neon PostgreSQL database.
 

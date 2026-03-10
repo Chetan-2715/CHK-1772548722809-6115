@@ -1,38 +1,50 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AppContext } from '../App';
-import { Activity, Camera, ScanLine, Clock, History, LogOut, User as UserIcon } from 'lucide-react';
+import { Activity, Camera, ScanLine, Clock, History, User as UserIcon, PhoneCall } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import './Navbar.css';
 
 const Navbar = () => {
-    const { user, logout, speakText } = useContext(AppContext);
+    const { user, speakText } = useContext(AppContext);
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation();
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-        speakText('Logged out successfully');
+    // Do not show Navbar on login or select-concern pages
+    if (location.pathname === '/login' || location.pathname === '/select-concern') {
+        return null;
+    }
+
+    const handleEmergencyCall = () => {
+        const phone = user?.medical_profile?.caretaker?.phone;
+        if (phone) {
+            speakText('Calling caretaker');
+            window.location.href = `tel:${phone}`;
+        } else {
+            speakText('No caretaker phone number found. Please add one in your profile.');
+            alert('No caretaker phone number found. Please add one in your profile.');
+        }
     };
 
     const navItems = [
-        { path: '/', name: 'Home', icon: Activity },
-        { path: '/upload', name: 'Prescription', icon: Camera },
-        { path: '/scan', name: 'Scan Medicine', icon: ScanLine },
-        { path: '/history', name: 'History', icon: History },
-        { path: '/reminders', name: 'Reminders', icon: Clock },
+        { path: '/', name: t('app.home'), icon: Activity },
+        { path: '/upload', name: t('app.prescription'), icon: Camera },
+        { path: '/scan', name: t('app.scan_medicine'), icon: ScanLine },
+        { path: '/history', name: t('app.history'), icon: History },
+        { path: '/profile', name: t('app.profile'), icon: UserIcon },
     ];
 
     return (
         <nav className="navbar">
-            <div className="navbar-container container">
+            <div className="navbar-container" style={{ width: '100%', padding: '0 2rem', maxWidth: 'none' }}>
                 <Link
                     to="/"
                     className="navbar-brand"
-                    onMouseEnter={() => speakText("Medi-Scribe Home")}
+                    onMouseEnter={() => speakText("Scan4Elders Home")}
                 >
                     <Activity className="brand-icon pulse-animation" />
-                    <span>Medi-Scribe</span>
+                    <span>{t('app.title')}</span>
                 </Link>
 
                 {user ? (
@@ -53,18 +65,19 @@ const Navbar = () => {
                             );
                         })}
                         <button
-                            onClick={handleLogout}
-                            className="btn btn-ghost nav-link logout-btn"
-                            onMouseEnter={() => speakText("Logout")}
+                            onClick={handleEmergencyCall}
+                            className="btn btn-ghost nav-link logout-btn text-red-600 hover:bg-red-50 hover:text-red-700"
+                            style={{ color: '#dc2626' }}
+                            onMouseEnter={() => speakText("Emergency Alert Call Caretaker")}
                         >
-                            <LogOut size={20} />
-                            <span className="nav-text">Logout</span>
+                            <PhoneCall size={20} />
+                            <span className="nav-text font-bold">Emergency</span>
                         </button>
                     </div>
                 ) : (
                     <div className="nav-menu">
                         <Link to="/login" className="btn btn-primary" onMouseEnter={() => speakText("Login or Register")}>
-                            <UserIcon size={18} /> Login / Register
+                            <UserIcon size={18} /> {t('app.login_register')}
                         </Link>
                     </div>
                 )}

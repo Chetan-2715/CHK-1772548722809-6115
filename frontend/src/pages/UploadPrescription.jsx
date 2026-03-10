@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { Upload, Camera, FileText, CheckCircle, AlertTriangle, PlayCircle } from 'lucide-react';
+import { Upload, Camera, FileText, CheckCircle, AlertTriangle, PlayCircle, Clock } from 'lucide-react';
 import { AppContext } from '../App';
-import { prescriptionAPI } from '../services/api';
+import { prescriptionAPI, remindersAPI } from '../services/api';
+import VerifyTablet from './VerifyTablet';
 import './UploadPrescription.css';
 
 const UploadPrescription = () => {
@@ -11,6 +12,10 @@ const UploadPrescription = () => {
     const [result, setResult] = useState(null);
     const [error, setError] = useState('');
     const { speakText } = useContext(AppContext);
+
+    // Reminder state
+    const [showReminderForm, setShowReminderForm] = useState(null);
+    const [reminderData, setReminderData] = useState({ frequency: 'daily', reminder_time: '09:00' });
 
     const handleFileChange = (e) => {
         const selected = e.target.files[0];
@@ -156,7 +161,7 @@ const UploadPrescription = () => {
                                 </button>
                             </div>
 
-                            <div className="medicines-list flex-col gap-4">
+                            <div className="medicines-list grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                                 {result.medicines.map((med, index) => (
                                     <div key={index} className="medicine-card card shadow-sm border border-slate-200">
                                         <div className="med-header flex justify-between items-center bg-slate-50 p-4 border-b border-slate-200 rounded-t-xl">
@@ -197,6 +202,47 @@ const UploadPrescription = () => {
                                                 </div>
                                             )}
                                         </div>
+
+                                        <div className="p-4 border-t border-slate-200 bg-white rounded-b-xl">
+                                            <button
+                                                className="btn btn-secondary w-full flex items-center justify-center gap-2"
+                                                onClick={() => setShowReminderForm(showReminderForm === index ? null : index)}
+                                            >
+                                                <Clock size={16} /> {showReminderForm === index ? 'Cancel Reminder' : 'Set Reminder'}
+                                            </button>
+
+                                            {showReminderForm === index && (
+                                                <form onSubmit={(e) => {
+                                                    e.preventDefault();
+                                                    remindersAPI.create({
+                                                        medicine_name: med.medicine_name,
+                                                        dosage: med.dosage || 'As prescribed',
+                                                        frequency: reminderData.frequency,
+                                                        reminder_time: reminderData.reminder_time,
+                                                        notes: ''
+                                                    }).then(() => {
+                                                        speakText(`Reminder set for ${med.medicine_name}`);
+                                                        setShowReminderForm(null);
+                                                    }).catch(err => {
+                                                        speakText("Failed to set reminder");
+                                                    });
+                                                }} className="mt-4 flex flex-col gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200 animate-slide-up">
+                                                    <div className="input-group m-0">
+                                                        <label className="label text-sm font-bold">Time to Take</label>
+                                                        <input type="time" className="input bg-white" required value={reminderData.reminder_time} onChange={e => setReminderData({ ...reminderData, reminder_time: e.target.value })} />
+                                                    </div>
+                                                    <div className="input-group m-0">
+                                                        <label className="label text-sm font-bold">Frequency</label>
+                                                        <select className="input bg-white" value={reminderData.frequency} onChange={e => setReminderData({ ...reminderData, frequency: e.target.value })}>
+                                                            <option value="daily">Every Day</option>
+                                                            <option value="twice_daily">Twice a Day</option>
+                                                            <option value="weekly">Once a Week</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" className="btn btn-primary w-full mt-2">Save Reminder</button>
+                                                </form>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -204,6 +250,12 @@ const UploadPrescription = () => {
                     )}
                 </div>
             </div>
+
+            {result && !loading && (
+                <div className="mt-12 animate-slide-up w-full max-w-4xl mx-auto border-t border-slate-200 pt-8 mt-12">
+                    <VerifyTablet />
+                </div>
+            )}
         </div>
     );
 };

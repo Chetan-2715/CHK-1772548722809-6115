@@ -16,6 +16,7 @@ router = APIRouter(prefix="/prescriptions", tags=["Prescriptions"])
 @router.post("/upload")
 async def upload_prescription(
     file: UploadFile = File(...),
+    domain: str = Header(None),
     authorization: str = Header(None),
     db: Session = Depends(get_db)
 ):
@@ -31,7 +32,7 @@ async def upload_prescription(
     mime_type = file.content_type or "image/jpeg"
 
     # Extract prescription data with Gemini Vision
-    result = await extract_prescription_data(image_bytes, mime_type)
+    result = await extract_prescription_data(image_bytes, mime_type, domain)
 
     if not result["success"]:
         raise HTTPException(status_code=500, detail=result.get("error", "Failed to process prescription"))

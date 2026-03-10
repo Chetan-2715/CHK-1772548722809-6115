@@ -8,8 +8,12 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
+    const domain = localStorage.getItem('selectedConcern');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (domain) {
+        config.headers.domain = domain;
     }
     return config;
 });
@@ -17,6 +21,8 @@ api.interceptors.request.use((config) => {
 export const authAPI = {
     login: (data) => api.post('/auth/login', data),
     register: (data) => api.post('/auth/register', data),
+    getProfile: () => api.get('/auth/profile'),
+    updateProfile: (data) => api.put('/auth/profile', data)
 };
 
 export const prescriptionAPI = {

@@ -2,33 +2,34 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../App';
 import { FileText, Camera, ScanLine, Clock, ArrowRight, ShieldCheck, HeartPulse } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import './Home.css';
 
 const Home = () => {
     const { user, speakText } = useContext(AppContext);
+    const { t } = useTranslation();
 
     return (
         <div className="home-container">
             {/* Hero Section */}
             <section className="hero-section">
                 <div className="hero-content">
-                    <Badge text="Made for Seniors" icon={<HeartPulse size={12} />} />
+                    <Badge text={t('home.badge')} icon={<HeartPulse size={12} />} />
                     <h1 className="hero-title">
-                        Your Personal <span className="text-gradient">AI Medication Assistant</span>
+                        {t('home.title_prefix')} <span className="text-gradient">{t('home.title_highlight')}</span>
                     </h1>
                     <p className="hero-subtitle">
-                        Understand your prescriptions, verify your tablets, and never miss a dose.
-                        Designed to be simple, clear, and easy to use.
+                        {t('home.subtitle')}
                     </p>
 
                     <div className="hero-actions">
                         {!user ? (
                             <Link to="/login" className="btn btn-primary hero-btn">
-                                Get Started <ArrowRight size={20} />
+                                {t('home.get_started')} <ArrowRight size={20} />
                             </Link>
                         ) : (
                             <Link to="/upload" className="btn btn-primary hero-btn" onMouseEnter={() => speakText("Scan a new prescription")}>
-                                <Camera size={20} /> Scan Prescription
+                                <Camera size={20} /> {t('home.scan_new')}
                             </Link>
                         )}
                     </div>
@@ -38,7 +39,7 @@ const Home = () => {
                     <div className="glass-mockup pulse-animation-slow">
                         <div className="mockup-header">
                             <ShieldCheck size={28} color="var(--success-color)" />
-                            <span>Verified Safe</span>
+                            <span>{t('home.verified_safe')}</span>
                         </div>
                         <div className="mockup-body">
                             <div className="skeleton-line full"></div>
@@ -54,30 +55,30 @@ const Home = () => {
 
             {/* Features Grid */}
             <section className="features-section">
-                <h2 className="section-title text-center">How Medi-Scribe Helps You</h2>
+                <h2 className="section-title text-center">{t('home.how_it_helps')}</h2>
 
                 <div className="grid-3 mt-8">
                     <FeatureCard
                         to="/upload"
                         icon={<FileText size={40} className="feature-icon" />}
-                        title="Read Prescriptions"
-                        description="Take a photo of your doctor's handwriting. Our AI will read it and explain every medicine simply."
+                        title={t('home.read')}
+                        description={t('home.read_desc')}
                         color="primary"
                     />
 
                     <FeatureCard
                         to="/scan"
                         icon={<ScanLine size={40} className="feature-icon" />}
-                        title="Verify Medicine"
-                        description="Not sure about a tablet? Scan its barcode or upload a picture to check if it's the right one."
+                        title={t('home.verify')}
+                        description={t('home.verify_desc')}
                         color="secondary"
                     />
 
                     <FeatureCard
                         to="/reminders"
                         icon={<Clock size={40} className="feature-icon" />}
-                        title="Smart Reminders"
-                        description="Get notified when it's time to take your pills automatically via Google Calendar."
+                        title={t('home.reminders')}
+                        description={t('home.reminders_desc')}
                         color="warning"
                     />
                 </div>

@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../App';
-import { Type, Sun, Moon, Contrast, Volume2, VolumeX, Settings } from 'lucide-react';
+import { Type, Sun, Moon, Contrast, Volume2, VolumeX, Settings, Globe } from 'lucide-react';
 import './AccessibilityControls.css';
+import { useTranslation } from 'react-i18next';
 
 const AccessibilityControls = () => {
     const {
@@ -11,6 +12,7 @@ const AccessibilityControls = () => {
         speakText
     } = useContext(AppContext);
     const [isOpen, setIsOpen] = useState(false);
+    const { t, i18n } = useTranslation();
 
     const togglePanel = () => {
         setIsOpen(!isOpen);
@@ -35,6 +37,14 @@ const AccessibilityControls = () => {
             // Small timeout to allow state to update before speaking
             setTimeout(() => speakText("Voice assistance enabled"), 100);
         }
+    };
+
+    const cycleLanguage = () => {
+        const langs = ['en', 'hi', 'mr'];
+        const currentIdx = langs.indexOf(i18n.language) >= 0 ? langs.indexOf(i18n.language) : 0;
+        const nextLang = langs[(currentIdx + 1) % langs.length];
+        i18n.changeLanguage(nextLang);
+        speakText(`Language changed to ${nextLang === 'en' ? 'English' : nextLang === 'hi' ? 'Hindi' : 'Marathi'}`);
     };
 
     return (
@@ -71,6 +81,16 @@ const AccessibilityControls = () => {
                         {theme === 'dark' && <Moon size={24} />}
                         {theme === 'high-contrast' && <Contrast size={24} />}
                         <span>{theme.replace('-', ' ')}</span>
+                    </button>
+
+                    {/* Language Setting */}
+                    <button
+                        className="a11y-btn hover-grow whitespace-nowrap"
+                        onClick={cycleLanguage}
+                        onMouseEnter={() => speakText("Change Language")}
+                    >
+                        <Globe size={24} />
+                        <span>{t('a11y.language')}: {i18n.language.toUpperCase()}</span>
                     </button>
 
                     {/* Voice Assistance */}

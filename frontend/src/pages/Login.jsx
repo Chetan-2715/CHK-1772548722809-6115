@@ -1,8 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AppContext } from '../App';
 import { authAPI } from '../services/api';
-import { User, Lock, Mail, Phone, Activity } from 'lucide-react';
+import { User, Lock, Mail, Phone, Activity, AlertTriangle } from 'lucide-react';
+import PatientForm from '../components/PatientForm';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -15,16 +16,31 @@ const Login = () => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showMedicalForm, setShowMedicalForm] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [toastMsg, setToastMsg] = useState('');
 
     const { login, speakText } = useContext(AppContext);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === 'age' && value !== '') {
+            const num = parseInt(value, 10);
+            if (num < 0 || num > 120) return;
+        }
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!isLogin && !agreedToTerms) {
+            setToastMsg("Please accept the Privacy Statement before creating an account.");
+            setTimeout(() => setToastMsg(''), 4000);
+            return;
+        }
+
         setLoading(true);
         setError('');
 
@@ -48,8 +64,8 @@ const Login = () => {
                     phone: formData.phone
                 });
                 login({ ...res.data.user, token: res.data.access_token });
-                speakText("Registration successful. Welcome to Medi-Scribe.");
-                navigate('/');
+                speakText("Registration successful. Please complete your medical profile.");
+                setShowMedicalForm(true);
             }
         } catch (err) {
             const msg = err.response?.data?.detail || "An error occurred";
@@ -60,6 +76,10 @@ const Login = () => {
         }
     };
 
+    if (showMedicalForm) {
+        return <PatientForm onComplete={() => navigate('/select-concern')} />;
+    }
+
     return (
         <div className="login-container flex justify-center items-center" style={{ minHeight: '70vh' }}>
             <div className="card card-glass w-full animate-slide-up" style={{ maxWidth: '500px' }}>
@@ -67,7 +87,7 @@ const Login = () => {
                     <Activity size={48} color="var(--primary-color)" className="pulse-animation-slow" style={{ margin: '0 auto', marginBottom: '1rem' }} />
                     <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
                     <p className="text-secondary">
-                        {isLogin ? 'Enter your details to access your account' : 'Join Medi-Scribe for a safer medication journey'}
+                        {isLogin ? 'Enter your details to access your account' : 'Join Scan4Elders for a safer medication journey'}
                     </p>
                 </div>
 
@@ -158,6 +178,20 @@ const Login = () => {
                         </div>
                     )}
 
+                    {!isLogin && (
+                        <div className="input-group mt-2">
+                            <label className="flex items-start gap-2 cursor-pointer font-medium text-sm text-slate-700">
+                                <input
+                                    type="checkbox"
+                                    checked={agreedToTerms}
+                                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                    className="mt-1"
+                                />
+                                <span>I agree to the <Link to="/privacy" className="text-primary hover:underline" target="_blank">Privacy Policy and Terms of Service</Link>.</span>
+                            </label>
+                        </div>
+                    )}
+
                     <button
                         type="submit"
                         className="btn btn-primary w-full mt-4"
@@ -186,6 +220,31 @@ const Login = () => {
                     </p>
                 </div>
             </div>
+
+            {toastMsg && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        backgroundColor: 'var(--error-light)',
+                        color: 'var(--error-color)',
+                        padding: '12px 24px',
+                        borderRadius: 'var(--radius-lg)',
+                        boxShadow: 'var(--shadow-lg)',
+                        zIndex: 1000,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        border: '1px solid var(--error-color)'
+                    }}
+                    className="animate-slide-up"
+                >
+                    <AlertTriangle size={20} />
+                    <span style={{ fontWeight: 500 }}>{toastMsg}</span>
+                </div>
+            )}
         </div>
     );
 };

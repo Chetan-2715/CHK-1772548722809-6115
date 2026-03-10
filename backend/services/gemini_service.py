@@ -20,7 +20,7 @@ def get_text_model():
     return genai.GenerativeModel("gemini-2.5-flash")
 
 
-async def extract_prescription_data(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
+async def extract_prescription_data(image_bytes: bytes, mime_type: str = "image/jpeg", domain: str = None) -> dict:
     """
     Extract medicine information from a prescription image using Gemini Vision API.
 
@@ -28,8 +28,16 @@ async def extract_prescription_data(image_bytes: bytes, mime_type: str = "image/
     """
     model = get_vision_model()
 
-    prompt = """Analyze this prescription image carefully. Extract ALL medicines mentioned in the prescription.
+    domain_instruction = f"""
+IMPORTANT DOMAIN RESTRICTION: The user is currently in the '{domain}' healthcare domain. If this prescription clearly belongs to a vastly different domain (e.g., they selected 'ayurvedic' but uploaded an 'allopathy' or 'homeopathy' prescription), you MUST reject it by returning exactly this JSON:
+{{
+    "success": false,
+    "error": "Domain Mismatch: This prescription appears to be outside your selected domain ({domain}). Please change your concern from the settings to scan it."
+}}
+""" if domain else ""
 
+    prompt = """Analyze this prescription image carefully. Extract ALL medicines mentioned in the prescription.
+""" + domain_instruction + """
 For each medicine, provide the following information in a JSON format:
 
 {
@@ -83,6 +91,8 @@ IMPORTANT:
             response_text = response_text[4:]
 
         result = json.loads(response_text.strip())
+        if result.get("success") is False:
+            return result
         return {"success": True, "data": result}
     except json.JSONDecodeError as e:
         return {"success": False, "error": f"Failed to parse AI response: {str(e)}", "raw": response_text}
@@ -90,13 +100,22 @@ IMPORTANT:
         return {"success": False, "error": f"AI processing failed: {str(e)}"}
 
 
-async def get_medicine_info(medicine_name: str) -> dict:
+async def get_medicine_info(medicine_name: str, domain: str = None) -> dict:
     """
     Get detailed information about a medicine using Gemini API.
     """
     model = get_text_model()
 
+    domain_instruction = f"""
+IMPORTANT DOMAIN RESTRICTION: The user is currently in the '{domain}' healthcare domain. If this medicine clearly belongs to a vastly different domain (e.g., they selected 'ayurvedic' but searched for an 'allopathy' medicine), you MUST reject it by returning exactly this JSON:
+{{
+    "success": false,
+    "error": "Domain Mismatch: This medicine appears to be outside your selected domain ({domain}). Please change your concern from the settings to view its details."
+}}
+""" if domain else ""
+
     prompt = f"""Provide detailed information about the medicine "{medicine_name}" in the following JSON format:
+{domain_instruction}
 
 {{
     "medicine_name": "{medicine_name}",
@@ -133,6 +152,8 @@ IMPORTANT:
             response_text = response_text[4:]
 
         result = json.loads(response_text.strip())
+        if result.get("success") is False:
+            return result
         return {"success": True, "data": result}
     except json.JSONDecodeError as e:
         return {"success": False, "error": f"Failed to parse AI response: {str(e)}"}
@@ -140,13 +161,22 @@ IMPORTANT:
         return {"success": False, "error": f"AI processing failed: {str(e)}"}
 
 
-async def identify_tablet_from_image(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
+async def identify_tablet_from_image(image_bytes: bytes, mime_type: str = "image/jpeg", domain: str = None) -> dict:
     """
     Identify a tablet/pill from an image using Gemini Vision API.
     """
     model = get_vision_model()
 
+    domain_instruction = f"""
+IMPORTANT DOMAIN RESTRICTION: The user is currently in the '{domain}' healthcare domain. If this medicine clearly belongs to a vastly different domain (e.g., they selected 'ayurvedic' but scanned an 'allopathy' medicine), you MUST reject it by returning exactly this JSON:
+{{
+    "success": false,
+    "error": "Domain Mismatch: This medicine appears to be outside your selected domain ({domain}). Please change your concern from the settings to scan it."
+}}
+""" if domain else ""
+
     prompt = """Look at this image of a tablet/pill/medicine. Identify it and provide the following information:
+""" + domain_instruction + """
 
 {
     "identified_medicine": "name of the identified medicine",
@@ -178,6 +208,8 @@ Return ONLY valid JSON, no markdown formatting."""
             response_text = response_text[4:]
 
         result = json.loads(response_text.strip())
+        if result.get("success") is False:
+            return result
         return {"success": True, "data": result}
     except json.JSONDecodeError as e:
         return {"success": False, "error": f"Failed to parse AI response: {str(e)}"}
