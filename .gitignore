@@ -34,3 +34,4 @@ backend/*.egg-info/
 
 # Agent / AI config
 .agent/
+frontend\.env.example
