@@ -11,8 +11,8 @@ const Navbar = () => {
     const location = useLocation();
     const { t } = useTranslation();
 
-    // Do not show Navbar on login or select-concern pages
-    if (location.pathname === '/login' || location.pathname === '/select-concern') {
+    // Do not show Navbar on login, role selection, blind assistant, or select-concern pages
+    if (['/login', '/role-selection', '/blind-assistant', '/select-concern'].includes(location.pathname)) {
         return null;
     }
 
@@ -86,7 +86,7 @@ const Navbar = () => {
                     </div>
                 ) : (
                     <div className="nav-menu">
-                        <Link to="/login" className="btn btn-primary" onMouseEnter={() => speakText("Login or Register")}>
+                        <Link to="/role-selection" className="btn btn-primary" onMouseEnter={() => speakText("Login or Register")}>
                             <UserIcon size={18} /> {t('app.login_register')}
                         </Link>
                     </div>

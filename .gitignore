@@ -31,3 +31,6 @@ backend/*.egg-info/
 .DS_Store
 .vscode/
 .idea/
+
+# Agent / AI config
+.agent/

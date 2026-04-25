@@ -14,6 +14,7 @@ from routes.prescription import router as prescription_router
 from routes.medicine import router as medicine_router
 from routes.reminder import router as reminder_router
 from routes.chatbot import router as chatbot_router
+from routes.voice import router as voice_router
 
 app = FastAPI(
     title="Scan4Elders API",
@@ -38,6 +39,7 @@ app.include_router(prescription_router)
 app.include_router(medicine_router)
 app.include_router(reminder_router)
 app.include_router(chatbot_router)
+app.include_router(voice_router)
 
 
 @app.on_event("startup")

@@ -12,6 +12,8 @@ import Profile from './pages/Profile';
 import Privacy from './pages/Privacy';
 import SelectConcern from './pages/SelectConcern';
 import Dashboard from './pages/Dashboard';
+import RoleSelection from './pages/RoleSelection';
+import BlindAssistant from './pages/BlindAssistant';
 
 
 // Context for user state and accessibility
@@ -135,6 +137,8 @@ function App() {
                     <main className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
                         <Routes>
                             <Route path="/" element={user ? <Dashboard /> : <Home />} />
+                            <Route path="/role-selection" element={<RoleSelection />} />
+                            <Route path="/blind-assistant" element={<BlindAssistant />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/upload" element={user ? <UploadPrescription /> : <Navigate to="/login" />} />
                             <Route path="/scan" element={user ? <ScanMedicine /> : <Navigate to="/login" />} />

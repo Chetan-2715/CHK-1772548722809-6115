@@ -24,7 +24,7 @@ const Home = () => {
 
                     <div className="hero-actions">
                         {!user ? (
-                            <Link to="/login" className="btn btn-primary hero-btn">
+                            <Link to="/role-selection" className="btn btn-primary hero-btn">
                                 {t('home.get_started')} <ArrowRight size={20} />
                             </Link>
                         ) : (

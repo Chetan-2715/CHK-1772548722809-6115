@@ -8,16 +8,17 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
+GEMINI_MODEL_NAME = "gemini-3-flash-preview"
 
 
 def get_vision_model():
     """Get a Gemini Vision model instance."""
-    return genai.GenerativeModel("gemini-2.5-flash")
+    return genai.GenerativeModel(GEMINI_MODEL_NAME)
 
 
 def get_text_model():
     """Get a Gemini Text model instance."""
-    return genai.GenerativeModel("gemini-2.5-flash")
+    return genai.GenerativeModel(GEMINI_MODEL_NAME)
 
 LANG_MAP = {
     'en': 'English',
