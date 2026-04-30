@@ -47,6 +47,18 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
       },
+      '/doctor': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/appointments': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
+      '/org': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+      },
     }
   }
 });

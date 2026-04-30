@@ -31,6 +31,9 @@ def get_db():
 
 
 def init_db():
-    """Create all tables in the database."""
+    """Create all tables in the database (correct FK order: org → user/doctor → appointment)."""
+    from models import organization  # must be first (org FK referenced by user/doctor)
     from models import user, prescription, medicine, reminder
+    from models import doctor, appointment
     Base.metadata.create_all(bind=engine)
+

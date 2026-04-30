@@ -14,24 +14,24 @@ import SelectConcern from './pages/SelectConcern';
 import Dashboard from './pages/Dashboard';
 import RoleSelection from './pages/RoleSelection';
 import BlindAssistant from './pages/BlindAssistant';
-
+import BookAppointment from './pages/BookAppointment';
+import DoctorPortal from './pages/DoctorPortal';
+import OrgDashboard from './pages/OrgDashboard';
+import Pricing from './pages/Pricing';
 
 // Context for user state and accessibility
 export const AppContext = React.createContext();
 
 function App() {
     const [user, setUser] = useState(null);
-    const [theme, setTheme] = useState('light'); // light, dark, high-contrast
-    const [fontSize, setFontSize] = useState('normal'); // normal, large, xlarge
+    const [theme, setTheme] = useState('light');
+    const [fontSize, setFontSize] = useState('normal');
     const [voiceEnabled, setVoiceEnabled] = useState(false);
     const [language, setLanguage] = useState('en');
 
     useEffect(() => {
-        // Check local storage for user and settings
         const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
+        if (storedUser) setUser(JSON.parse(storedUser));
 
         const storedTheme = localStorage.getItem('theme');
         if (storedTheme) setTheme(storedTheme);
@@ -49,7 +49,6 @@ function App() {
         }
     }, []);
 
-    // Update DOM when accessibility settings change
     useEffect(() => {
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.setAttribute('data-fontsize', fontSize);
@@ -58,44 +57,35 @@ function App() {
         localStorage.setItem('voiceEnabled', voiceEnabled);
     }, [theme, fontSize, voiceEnabled]);
 
-    // Global TTS function
     const speakText = (text) => {
         if (!voiceEnabled || !window.speechSynthesis) return;
-
-        // Cancel any ongoing speech
         window.speechSynthesis.cancel();
-
         const maxRetries = 3;
         let attempts = 0;
-
         const trySpeak = () => {
             attempts++;
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.9; // Slightly slower for seniors
+            utterance.rate = 0.9;
             utterance.pitch = 1.0;
-
             const voices = window.speechSynthesis.getVoices();
             if (voices.length > 0) {
-                // Try to find a clear voice
                 const englishVoices = voices.filter(v => v.lang.startsWith('en'));
                 utterance.voice = englishVoices[0] || voices[0];
                 window.speechSynthesis.speak(utterance);
             } else if (attempts < maxRetries) {
-                // Voices not loaded yet, wait and retry
                 setTimeout(trySpeak, 100);
             } else {
-                // Fallback
                 window.speechSynthesis.speak(utterance);
             }
         };
-
         trySpeak();
     };
 
     const login = (userData) => {
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('token', userData.token); // Assume returned in userData
+        // Support both token field names from different endpoints
+        localStorage.setItem('token', userData.access_token || userData.token || '');
     };
 
     const updateUser = (newUserData) => {
@@ -107,6 +97,15 @@ function App() {
         setUser(null);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+    };
+
+    // Role-based default route after login
+    const getRoleHome = () => {
+        if (!user) return <Home />;
+        const role = user.role || 'patient';
+        if (role === 'doctor') return <Navigate to="/doctor-portal" />;
+        if (role === 'org_admin') return <Navigate to="/org-dashboard" />;
+        return <Dashboard />;
     };
 
     const contextValue = {
@@ -136,19 +135,34 @@ function App() {
                     <Navbar />
                     <main className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
                         <Routes>
-                            <Route path="/" element={user ? <Dashboard /> : <Home />} />
-                            <Route path="/role-selection" element={<RoleSelection />} />
+                            {/* Root — role-based redirect */}
+                            <Route path="/" element={user ? getRoleHome() : <Home />} />
+
+                            {/* Public routes */}
+                            <Route path="/role-selection" element={<Navigate to="/login" replace />} />
                             <Route path="/blind-assistant" element={<BlindAssistant />} />
                             <Route path="/login" element={<Login />} />
+                            <Route path="/privacy" element={<Privacy />} />
+                            <Route path="/pricing" element={<Pricing />} />
+
+                            {/* Patient routes (auth required) */}
                             <Route path="/upload" element={user ? <UploadPrescription /> : <Navigate to="/login" />} />
                             <Route path="/scan" element={user ? <ScanMedicine /> : <Navigate to="/login" />} />
                             <Route path="/history" element={user ? <MedicineHistory /> : <Navigate to="/login" />} />
                             <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
-                            <Route path="/privacy" element={<Privacy />} />
                             <Route path="/select-concern" element={user ? <SelectConcern /> : <Navigate to="/login" />} />
+                            <Route path="/book-appointment" element={user ? <BookAppointment /> : <Navigate to="/login" />} />
+
+                            {/* Doctor portal */}
+                            <Route path="/doctor-portal" element={user ? <DoctorPortal /> : <Navigate to="/login" />} />
+
+                            {/* Organization admin dashboard */}
+                            <Route path="/org-dashboard" element={user ? <OrgDashboard /> : <Navigate to="/login" />} />
+
+                            {/* Catch-all */}
+                            <Route path="*" element={<Navigate to="/" />} />
                         </Routes>
                     </main>
-
                 </div>
             </BrowserRouter>
         </AppContext.Provider>

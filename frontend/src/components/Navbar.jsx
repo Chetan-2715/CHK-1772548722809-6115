@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AppContext } from '../App';
-import { Activity, Camera, ScanLine, Clock, History, User as UserIcon, PhoneCall } from 'lucide-react';
+import { Activity, Camera, ScanLine, History, User as UserIcon, PhoneCall, Stethoscope, Calendar, Building2, Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import './Navbar.css';
 
@@ -11,8 +11,8 @@ const Navbar = () => {
     const location = useLocation();
     const { t } = useTranslation();
 
-    // Do not show Navbar on login, role selection, blind assistant, or select-concern pages
-    if (['/login', '/role-selection', '/blind-assistant', '/select-concern'].includes(location.pathname)) {
+    // Do not show Navbar on login, blind assistant, or select-concern pages
+    if (['/login', '/blind-assistant', '/select-concern'].includes(location.pathname)) {
         return null;
     }
 
@@ -27,13 +27,36 @@ const Navbar = () => {
         }
     };
 
-    const navItems = [
-        { path: '/', name: t('app.home'), icon: Activity },
-        { path: '/upload', name: t('app.prescription'), icon: Camera },
-        { path: '/scan', name: t('app.scan_medicine'), icon: ScanLine },
-        { path: '/history', name: t('app.history'), icon: History },
-        { path: '/profile', name: t('app.profile'), icon: UserIcon },
-    ];
+    // Role-aware nav items
+    const getNavItems = () => {
+        if (!user) return [];
+
+        const role = user.role || 'patient';
+
+        if (role === 'doctor') {
+            return [
+                { path: '/doctor-portal', name: 'My Portal', icon: Stethoscope },
+            ];
+        }
+
+        if (role === 'org_admin') {
+            return [
+                { path: '/org-dashboard', name: 'Dashboard', icon: Building2 },
+            ];
+        }
+
+        // Patient (default)
+        return [
+            { path: '/', name: t('app.home'), icon: Activity },
+            { path: '/upload', name: t('app.prescription'), icon: Camera },
+            { path: '/scan', name: t('app.scan_medicine'), icon: ScanLine },
+            { path: '/book-appointment', name: 'Appointments', icon: Calendar },
+            { path: '/history', name: t('app.history'), icon: History },
+            { path: '/profile', name: t('app.profile'), icon: UserIcon },
+        ];
+    };
+
+    const navItems = getNavItems();
 
     return (
         <nav className="navbar">
@@ -74,19 +97,37 @@ const Navbar = () => {
                                 </Link>
                             );
                         })}
-                        <button
-                            onClick={handleEmergencyCall}
-                            className="btn btn-ghost nav-link logout-btn text-red-600 hover:bg-red-50 hover:text-red-700"
-                            style={{ color: '#dc2626' }}
-                            onMouseEnter={() => speakText("Emergency Alert Call Caretaker")}
+
+                        {/* Pricing — shown to all roles */}
+                        <Link
+                            to="/pricing"
+                            className={`nav-link ${location.pathname === '/pricing' ? 'active' : ''}`}
+                            onMouseEnter={() => speakText('Pricing Plans')}
                         >
-                            <PhoneCall size={20} />
-                            <span className="nav-text font-bold">Emergency</span>
-                        </button>
+                            <Tag size={20} />
+                            <span className="nav-text">Pricing</span>
+                        </Link>
+
+                        {/* Emergency — only for patients */}
+                        {(!user.role || user.role === 'patient') && (
+                            <button
+                                onClick={handleEmergencyCall}
+                                className="btn btn-ghost nav-link logout-btn text-red-600 hover:bg-red-50 hover:text-red-700"
+                                style={{ color: '#dc2626' }}
+                                onMouseEnter={() => speakText("Emergency Alert Call Caretaker")}
+                            >
+                                <PhoneCall size={20} />
+                                <span className="nav-text font-bold">Emergency</span>
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="nav-menu">
-                        <Link to="/role-selection" className="btn btn-primary" onMouseEnter={() => speakText("Login or Register")}>
+                        <Link to="/pricing" className="nav-link" onMouseEnter={() => speakText('Pricing Plans')}>
+                            <Tag size={18} />
+                            <span className="nav-text">Pricing</span>
+                        </Link>
+                        <Link to="/login" className="btn btn-primary" onMouseEnter={() => speakText("Login or Register")}>
                             <UserIcon size={18} /> {t('app.login_register')}
                         </Link>
                     </div>
@@ -97,3 +138,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

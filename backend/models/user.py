@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, JSON
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, JSON, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -13,6 +13,13 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     age = Column(Integer, nullable=True)
     phone = Column(String(20), nullable=True)
+
+    # Role-based access: patient | doctor | pharmacist | org_admin
+    role = Column(String(20), default="patient", nullable=False)
+
+    # B2B org link (nullable — independent patients don't belong to any org)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+
     accessibility_large_font = Column(Boolean, default=False)
     accessibility_high_contrast = Column(Boolean, default=False)
     accessibility_voice = Column(Boolean, default=False)
@@ -27,3 +34,5 @@ class User(Base):
     prescriptions = relationship("Prescription", back_populates="user", cascade="all, delete-orphan")
     reminders = relationship("Reminder", back_populates="user", cascade="all, delete-orphan")
     medicine_history = relationship("MedicineHistory", back_populates="user", cascade="all, delete-orphan")
+    appointments = relationship("Appointment", back_populates="patient", cascade="all, delete-orphan")
+
